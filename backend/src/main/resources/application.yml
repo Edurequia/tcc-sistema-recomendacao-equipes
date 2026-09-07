@@ -1,0 +1,53 @@
+# ---------------------------------------------------------------------------
+# Configuracao comum a todos os perfis.
+# O perfil ativo define o banco: "dev" (H2 em memoria) ou "local" (PostgreSQL).
+# Nenhum segredo deve ser escrito neste arquivo - use variaveis de ambiente.
+# ---------------------------------------------------------------------------
+spring:
+  application:
+    name: teamrec
+  profiles:
+    default: dev
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+# Propriedades da aplicacao (prefixo "app")
+app:
+  cors:
+    # Origem do frontend React (Vite usa 5173; CRA usa 3000)
+    allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+  # Microsservico Python (FastAPI + PyCaret) - consumido a partir da Fase 4
+  prediction:
+    base-url: ${PREDICTION_BASE_URL:http://localhost:8000}
+    connect-timeout: 3s
+    read-timeout: 15s
+
+# Expoe apenas o essencial do Actuator; nada de endpoints sensiveis abertos
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    br.ufn.tfg.teamrec: DEBUG

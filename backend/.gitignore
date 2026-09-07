@@ -1,0 +1,24 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### Segredos - nunca versionar ###
+.env
+*.env
+application-secret.yml
+
+### IDE ###
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+### SO ###
+.DS_Store
+Thumbs.db
+
+### Logs ###
+*.log

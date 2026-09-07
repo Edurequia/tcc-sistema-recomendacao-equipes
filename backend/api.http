@@ -1,0 +1,352 @@
+### =========================================================================
+### TeamRec — roteiro de testes da API
+###
+### Abra este arquivo no IntelliJ e clique no ícone ▶ à esquerda de cada
+### requisição. As respostas aparecem no painel "Services".
+###
+### Execute na ordem: as requisições marcadas com (*) guardam variáveis
+### usadas pelas seguintes.
+### =========================================================================
+
+@host = http://localhost:8080
+
+### -------------------------------------------------------------------------
+### 0. A aplicação está no ar?
+### -------------------------------------------------------------------------
+GET {{host}}/actuator/health
+
+
+### =========================================================================
+### HABILIDADES — catálogo carregado automaticamente na inicialização
+### =========================================================================
+
+### 1. Catálogo completo (38 itens: 30 tecnologias + 8 comportamentais)
+GET {{host}}/api/habilidades
+
+### 2. Só as competências técnicas (30)
+GET {{host}}/api/habilidades?tipo=HARD
+
+### 3. Só as comportamentais (8) — repare em "usadaNoModelo": false
+GET {{host}}/api/habilidades?tipo=SOFT
+
+### 4. (*) Guarda os ids de Java, Spring Boot e React para as próximas
+# @name catalogo
+GET {{host}}/api/habilidades?tipo=HARD
+
+> {%
+    const acha = (nome) => response.body.find(h => h.nome === nome).id;
+    client.global.set("idJava",   acha("Java"));
+    client.global.set("idSpring", acha("Spring Boot"));
+    client.global.set("idReact",  acha("React"));
+    client.global.set("idDocker", acha("Docker"));
+    client.log("Java=" + client.global.get("idJava")
+             + " Spring=" + client.global.get("idSpring")
+             + " React=" + client.global.get("idReact"));
+%}
+
+### 5. Cadastrar uma habilidade nova
+POST {{host}}/api/habilidades
+Content-Type: application/json
+
+{
+  "nome": "Quarkus",
+  "tipo": "HARD",
+  "categoria": "FRAMEWORK"
+}
+
+### 6. Nome duplicado — espera 409
+POST {{host}}/api/habilidades
+Content-Type: application/json
+
+{
+  "nome": "spring boot",
+  "tipo": "HARD",
+  "categoria": "FRAMEWORK"
+}
+
+### 7. Corpo inválido — espera 400 com o detalhe por campo
+POST {{host}}/api/habilidades
+Content-Type: application/json
+
+{
+  "nome": ""
+}
+
+
+### =========================================================================
+### DESENVOLVEDORES
+### =========================================================================
+
+### 8. (*) Cadastrar uma sênior de backend
+# @name devAna
+POST {{host}}/api/desenvolvedores
+Content-Type: application/json
+
+{
+  "nome": "Ana Souza",
+  "email": "  ANA.SOUZA@UFN.EDU.BR ",
+  "senioridade": "SENIOR",
+  "papelPrincipal": "BACKEND",
+  "softSkillsScore": 4.50,
+  "horasDisponiveis": 30,
+  "habilidades": [
+    { "habilidadeId": {{idJava}},   "proficiencia": 5 },
+    { "habilidadeId": {{idSpring}}, "proficiencia": 5 },
+    { "habilidadeId": {{idDocker}}, "proficiencia": 3 }
+  ]
+}
+
+> {%
+    client.global.set("idAna", response.body.id);
+    client.test("e-mail foi normalizado", function() {
+        client.assert(response.body.email === "ana.souza@ufn.edu.br",
+                      "esperado minúsculas e sem espaços");
+    });
+%}
+
+### 9. Cadastrar um júnior de frontend
+POST {{host}}/api/desenvolvedores
+Content-Type: application/json
+
+{
+  "nome": "Bruno Lima",
+  "email": "bruno.lima@ufn.edu.br",
+  "senioridade": "JUNIOR",
+  "papelPrincipal": "FRONTEND",
+  "softSkillsScore": 3.20,
+  "horasDisponiveis": 40,
+  "habilidades": [
+    { "habilidadeId": {{idReact}}, "proficiencia": 4 }
+  ]
+}
+
+### 10. Cadastrar um pleno fullstack
+POST {{host}}/api/desenvolvedores
+Content-Type: application/json
+
+{
+  "nome": "Carla Reis",
+  "email": "carla.reis@ufn.edu.br",
+  "senioridade": "PLENO",
+  "papelPrincipal": "FULLSTACK",
+  "softSkillsScore": 4.10,
+  "horasDisponiveis": 20,
+  "habilidades": [
+    { "habilidadeId": {{idJava}},  "proficiencia": 3 },
+    { "habilidadeId": {{idReact}}, "proficiencia": 4 }
+  ]
+}
+
+### 11. Perfil completo, com as competências resolvidas
+GET {{host}}/api/desenvolvedores/{{idAna}}
+
+### 12. Listagem paginada — repare no envelope (conteudo, totalElementos...)
+GET {{host}}/api/desenvolvedores
+
+### 13. Filtros combinados
+GET {{host}}/api/desenvolvedores?papel=BACKEND&senioridade=SENIOR
+
+### 14. Busca parcial por nome, sem diferenciar maiúsculas
+GET {{host}}/api/desenvolvedores?nome=ana
+
+### 15. Paginação explícita
+GET {{host}}/api/desenvolvedores?page=0&size=2
+
+### 16. Ajustar só a disponibilidade (não mexe nas competências)
+PATCH {{host}}/api/desenvolvedores/{{idAna}}/disponibilidade
+Content-Type: application/json
+
+{
+  "horasDisponiveis": 12
+}
+
+### 17. E-mail duplicado — espera 409
+POST {{host}}/api/desenvolvedores
+Content-Type: application/json
+
+{
+  "nome": "Outra Ana",
+  "email": "ANA.SOUZA@ufn.edu.br",
+  "senioridade": "PLENO",
+  "papelPrincipal": "QA",
+  "softSkillsScore": 3.00,
+  "horasDisponiveis": 40
+}
+
+### 18. Escore fora da escala 0-5 e horas negativas — espera 400
+POST {{host}}/api/desenvolvedores
+Content-Type: application/json
+
+{
+  "nome": "Teste Invalido",
+  "email": "teste@ufn.edu.br",
+  "senioridade": "PLENO",
+  "papelPrincipal": "MOBILE",
+  "softSkillsScore": 7.50,
+  "horasDisponiveis": -5
+}
+
+### 19. Habilidade inexistente — espera 404 dizendo qual
+POST {{host}}/api/desenvolvedores
+Content-Type: application/json
+
+{
+  "nome": "Teste Fantasma",
+  "email": "fantasma@ufn.edu.br",
+  "senioridade": "JUNIOR",
+  "papelPrincipal": "DEVOPS",
+  "softSkillsScore": 3.00,
+  "horasDisponiveis": 40,
+  "habilidades": [ { "habilidadeId": 999999, "proficiencia": 3 } ]
+}
+
+### 20. Mesma habilidade duas vezes — espera 422
+POST {{host}}/api/desenvolvedores
+Content-Type: application/json
+
+{
+  "nome": "Teste Duplicado",
+  "email": "duplicado@ufn.edu.br",
+  "senioridade": "PLENO",
+  "papelPrincipal": "BACKEND",
+  "softSkillsScore": 3.50,
+  "horasDisponiveis": 40,
+  "habilidades": [
+    { "habilidadeId": {{idJava}}, "proficiencia": 5 },
+    { "habilidadeId": {{idJava}}, "proficiencia": 2 }
+  ]
+}
+
+
+### =========================================================================
+### PROJETOS
+### =========================================================================
+
+### 21. (*) Projeto de criticidade alta, equipe de 4
+# @name projeto
+POST {{host}}/api/projetos
+Content-Type: application/json
+
+{
+  "nome": "Portal Acadêmico",
+  "descricao": "Reescrita do portal do aluno, com integração ao sistema acadêmico.",
+  "criticidade": "ALTA",
+  "tamanhoEquipe": 4,
+  "horasSemanaisPorIntegrante": 20,
+  "dataInicioPrevista": "2026-10-01",
+  "dataFimPrevista": "2027-03-31",
+  "papeisRequeridos": [
+    { "papel": "BACKEND",  "quantidade": 2 },
+    { "papel": "FRONTEND", "quantidade": 1 }
+  ],
+  "habilidadesRequeridas": [
+    { "habilidadeId": {{idJava}},   "obrigatoria": true,  "peso": 5 },
+    { "habilidadeId": {{idSpring}}, "obrigatoria": true,  "peso": 4 },
+    { "habilidadeId": {{idReact}},  "obrigatoria": false, "peso": 3 }
+  ]
+}
+
+> {%
+    client.global.set("idProjeto", response.body.id);
+    client.test("uma vaga ficou sem papel fixo", function() {
+        client.assert(response.body.vagasDeclaradas === 3);
+        client.assert(response.body.vagasSemPapelFixo === 1);
+    });
+%}
+
+### 22. Projeto completo, com os requisitos
+GET {{host}}/api/projetos/{{idProjeto}}
+
+### 23. Listagem paginada
+GET {{host}}/api/projetos
+
+### 24. Filtro por criticidade
+GET {{host}}/api/projetos?criticidade=ALTA
+
+### 25. Vagas além do tamanho da equipe — espera 422
+POST {{host}}/api/projetos
+Content-Type: application/json
+
+{
+  "nome": "Projeto Inconsistente",
+  "criticidade": "MEDIA",
+  "tamanhoEquipe": 3,
+  "horasSemanaisPorIntegrante": 20,
+  "papeisRequeridos": [
+    { "papel": "BACKEND", "quantidade": 2 },
+    { "papel": "QA",      "quantidade": 2 }
+  ]
+}
+
+### 26. Mesmo papel declarado duas vezes — espera 422
+POST {{host}}/api/projetos
+Content-Type: application/json
+
+{
+  "nome": "Projeto Papel Repetido",
+  "criticidade": "BAIXA",
+  "tamanhoEquipe": 6,
+  "horasSemanaisPorIntegrante": 20,
+  "papeisRequeridos": [
+    { "papel": "BACKEND", "quantidade": 2 },
+    { "papel": "BACKEND", "quantidade": 1 }
+  ]
+}
+
+### 27. Término antes do início — espera 422
+POST {{host}}/api/projetos
+Content-Type: application/json
+
+{
+  "nome": "Projeto Periodo Invertido",
+  "criticidade": "MEDIA",
+  "tamanhoEquipe": 3,
+  "horasSemanaisPorIntegrante": 20,
+  "dataInicioPrevista": "2026-10-01",
+  "dataFimPrevista": "2026-09-01"
+}
+
+### 28. Colocar o projeto em andamento
+PATCH {{host}}/api/projetos/{{idProjeto}}/status
+Content-Type: application/json
+
+{
+  "status": "EM_ANDAMENTO"
+}
+
+
+### =========================================================================
+### EXCLUSÃO LÓGICA — nada some de verdade
+### =========================================================================
+
+### 29. Inativar a Ana
+DELETE {{host}}/api/desenvolvedores/{{idAna}}
+
+### 30. Ela continua existindo, agora com "ativo": false
+GET {{host}}/api/desenvolvedores/{{idAna}}
+
+### 31. Mas saiu da listagem de ativos
+GET {{host}}/api/desenvolvedores?ativo=true
+
+### 32. Reativar
+POST {{host}}/api/desenvolvedores/{{idAna}}/reativacao
+
+### 33. Cancelar o projeto (equivale à exclusão lógica)
+DELETE {{host}}/api/projetos/{{idProjeto}}
+
+### 34. Ele continua lá, agora CANCELADO
+GET {{host}}/api/projetos/{{idProjeto}}
+
+
+### =========================================================================
+### FORMATO DE ERRO — sempre o mesmo, em qualquer rota
+### =========================================================================
+
+### 35. Rota inexistente — 404
+GET {{host}}/api/nao-existe
+
+### 36. Identificador não numérico — 400
+GET {{host}}/api/desenvolvedores/abc
+
+### 37. Verbo não suportado — 405
+DELETE {{host}}/actuator/health

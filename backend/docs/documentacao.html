@@ -1,0 +1,1634 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backend TeamRec</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; font-family: system-ui, sans-serif; font-size: 14px; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap">
+</head>
+<body>
+
+<style>
+/* ==========================================================================
+   Tokens — paleta completa no :root, redefinida por tema.
+   ========================================================================== */
+:root {
+  --ground:      #F5F7F5;
+  --surface:     #FFFFFF;
+  --surface-2:   #EAEFEC;
+  --ink:         #131E1C;
+  --ink-2:       #3D4D49;
+  --ink-3:       #6D807B;
+  --line:        #D5DEDA;
+  --line-soft:   #E4EAE7;
+  --accent:      #0F6156;
+  --accent-ink:  #0B463E;
+  --accent-soft: #E0EEEA;
+  --st-done:     #2F7A5B;
+  --st-now:      #A9702A;
+  --st-future:   #7C8F8A;
+  --alert:       #A8432E;
+  --alert-soft:  #F7E9E5;
+  --shadow:      0 1px 2px rgba(19, 30, 28, .05), 0 6px 20px -12px rgba(19, 30, 28, .18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #0C1312;
+    --surface:     #141E1C;
+    --surface-2:   #1B2825;
+    --ink:         #E5ECE9;
+    --ink-2:       #A8B9B4;
+    --ink-3:       #7B8E89;
+    --line:        #25322E;
+    --line-soft:   #1E2A27;
+    --accent:      #5CC3AD;
+    --accent-ink:  #8FDCCA;
+    --accent-soft: #16302B;
+    --st-done:     #5FBF8E;
+    --st-now:      #D8A05A;
+    --st-future:   #7B8E89;
+    --alert:       #E58A72;
+    --alert-soft:  #2C1B17;
+    --shadow:      0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px -12px rgba(0, 0, 0, .7);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground:      #0C1312;
+  --surface:     #141E1C;
+  --surface-2:   #1B2825;
+  --ink:         #E5ECE9;
+  --ink-2:       #A8B9B4;
+  --ink-3:       #7B8E89;
+  --line:        #25322E;
+  --line-soft:   #1E2A27;
+  --accent:      #5CC3AD;
+  --accent-ink:  #8FDCCA;
+  --accent-soft: #16302B;
+  --st-done:     #5FBF8E;
+  --st-now:      #D8A05A;
+  --st-future:   #7B8E89;
+  --alert:       #E58A72;
+  --alert-soft:  #2C1B17;
+  --shadow:      0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px -12px rgba(0, 0, 0, .7);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Newsreader", ui-serif, Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  text-wrap: balance;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+}
+
+code, kbd, .mono {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.855em;
+  font-variant-ligatures: none;
+}
+
+p code, li code, td code {
+  background: var(--surface-2);
+  border-radius: 3px;
+  padding: 0.1em 0.36em;
+  color: var(--accent-ink);
+}
+
+a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* ==========================================================================
+   Shell
+   ========================================================================== */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px 96px;
+}
+
+.masthead {
+  border-bottom: 1px solid var(--line);
+  padding: 56px 0 32px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 14px;
+}
+
+.masthead h1 {
+  font-size: clamp(40px, 6vw, 62px);
+  letter-spacing: -0.022em;
+}
+
+.masthead .deck {
+  font-family: "Newsreader", ui-serif, Georgia, serif;
+  font-size: clamp(18px, 2.2vw, 21px);
+  font-style: italic;
+  color: var(--ink-2);
+  max-width: 60ch;
+  margin: 16px 0 0;
+  line-height: 1.5;
+}
+
+.factbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.fact { display: flex; flex-direction: column; gap: 1px; }
+.fact dt {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.fact dd { margin: 0; font-size: 14px; font-weight: 500; }
+
+/* ==========================================================================
+   Progress meter — encodes real state, not decoration
+   ========================================================================== */
+.meter { margin-top: 28px; }
+.meter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-bottom: 8px;
+}
+.meter-head strong { color: var(--ink); font-weight: 600; }
+.meter-track {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+}
+.meter-cell {
+  height: 7px;
+  border-radius: 1px;
+  background: var(--line);
+}
+.meter-cell[data-state="done"] { background: var(--st-done); }
+.meter-cell[data-state="now"]  { background: var(--st-now); }
+
+/* ==========================================================================
+   Layout: sticky contents + reading column
+   ========================================================================== */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  margin-top: 48px;
+}
+
+@media (min-width: 1020px) {
+  .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 64px; }
+  .toc { position: sticky; top: 32px; align-self: start; max-height: calc(100vh - 64px); overflow-y: auto; }
+}
+
+.toc h2 {
+  font-family: "Archivo", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.toc a {
+  display: block;
+  padding: 4px 10px 4px 12px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  text-decoration: none;
+  border-left: 2px solid var(--line);
+  line-height: 1.35;
+}
+.toc a:hover { color: var(--ink); background: var(--surface-2); }
+.toc a.on { color: var(--accent-ink); border-left-color: var(--accent); font-weight: 500; }
+
+main { min-width: 0; }
+
+section { margin-bottom: 68px; scroll-margin-top: 24px; }
+section > h2 {
+  font-size: clamp(27px, 3.4vw, 34px);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 6px;
+}
+.sec-note {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin: 0 0 26px;
+}
+section h3 {
+  font-size: 21px;
+  margin: 36px 0 10px;
+}
+section h4 {
+  font-family: "Archivo", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 28px 0 10px;
+}
+p { margin: 0 0 16px; max-width: 68ch; }
+main ul, main ol { max-width: 68ch; padding-left: 20px; margin: 0 0 16px; }
+main li { margin-bottom: 7px; }
+
+.lede {
+  font-size: 17.5px;
+  color: var(--ink-2);
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+.tw { overflow-x: auto; margin: 0 0 20px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+thead th {
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ==========================================================================
+   Code
+   ========================================================================== */
+pre {
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0 0 20px;
+  font-size: 12.8px;
+  line-height: 1.68;
+}
+pre code { background: none; padding: 0; color: var(--ink-2); font-size: inherit; }
+pre .c { color: var(--ink-3); }
+pre .k { color: var(--accent-ink); font-weight: 500; }
+
+/* ==========================================================================
+   Callout — used sparingly, for decisions and open risks
+   ========================================================================== */
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 14px 18px;
+  margin: 0 0 22px;
+  border-radius: 0 4px 4px 0;
+  font-size: 14.5px;
+  max-width: 68ch;
+}
+.note.warn { border-left-color: var(--alert); background: var(--alert-soft); }
+.note p:last-child { margin-bottom: 0; }
+.note strong { font-weight: 600; }
+
+/* ==========================================================================
+   Architecture diagram
+   ========================================================================== */
+.figure { margin: 0 0 24px; }
+.figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 12.5px; color: var(--ink-3); margin-top: 8px; max-width: 68ch; }
+.svg-box  { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.svg-hero { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.svg-t    { fill: var(--ink); font-family: "Archivo", sans-serif; font-size: 14px; font-weight: 600; }
+.svg-s    { fill: var(--ink-3); font-family: "JetBrains Mono", monospace; font-size: 10.5px; }
+.svg-e    { fill: var(--ink-3); font-family: "Archivo", sans-serif; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; }
+.svg-line { stroke: var(--ink-3); stroke-width: 1.4; fill: none; }
+
+/* ==========================================================================
+   Relationship sentences — the domain model, read as phrases
+   ========================================================================== */
+.rels { display: flex; flex-direction: column; gap: 10px; margin: 0 0 8px; }
+.rel {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 10px 14px;
+  overflow-x: auto;
+}
+.ent {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.ent.join { background: var(--accent-soft); color: var(--accent-ink); }
+.link {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--ink-3);
+  padding: 0 9px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Entity cards
+   ========================================================================== */
+.ents {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: 12px;
+  margin: 0 0 22px;
+}
+.ecard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ecard-h {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent-ink);
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 7px;
+}
+.ecard p { font-size: 13px; color: var(--ink-2); margin: 0; line-height: 1.5; }
+.fields {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  line-height: 1.75;
+  word-break: break-word;
+}
+
+/* ==========================================================================
+   Phase timeline — numbered because the order is real
+   ========================================================================== */
+.phases { display: flex; flex-direction: column; gap: 0; margin: 0 0 20px; }
+.phase {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.phase:first-child { border-top: none; }
+.phase-n {
+  font-family: "Newsreader", serif;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--st-future);
+  font-variant-numeric: tabular-nums;
+  padding-top: 2px;
+}
+.phase[data-state="done"] .phase-n { color: var(--st-done); }
+.phase[data-state="now"]  .phase-n { color: var(--st-now); }
+.phase-b { min-width: 0; }
+.phase-t {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+.phase-t h3 { margin: 0; font-size: 19px; }
+.pill {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+  color: var(--st-future);
+  white-space: nowrap;
+}
+.pill[data-state="done"] { color: var(--st-done); }
+.pill[data-state="now"]  { color: var(--st-now); }
+.phase-b p { font-size: 14.5px; margin: 0 0 8px; color: var(--ink-2); }
+.phase-b ul { font-size: 14px; margin: 0; color: var(--ink-2); }
+.phase-b li { margin-bottom: 4px; }
+
+/* ==========================================================================
+   Vector strip — the 39 model features
+   ========================================================================== */
+.vector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0 0 8px;
+}
+.vslot {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  padding: 3px 7px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.vslot.hi { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--ink-3); margin: 0 0 20px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+footer {
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 20px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <p class="eyebrow">Trabalho Final de Graduação · Sistemas de Informação · UFN</p>
+    <h1>Backend TeamRec</h1>
+    <p class="deck">O serviço que orquestra a recomendação de equipes: guarda o domínio,
+      consulta o motor de predição, aplica as regras de nivelamento e entrega o resultado
+      ao gestor com a explicação do modelo de linguagem.</p>
+
+    <dl class="factbar">
+      <div class="fact"><dt>Módulo</dt><dd>Backend orquestrador</dd></div>
+      <div class="fact"><dt>Runtime</dt><dd>Java 21 · Spring Boot 3.5.16</dd></div>
+      <div class="fact"><dt>Persistência</dt><dd>PostgreSQL</dd></div>
+      <div class="fact"><dt>Pacote</dt><dd class="mono">br.ufn.tfg.teamrec</dd></div>
+      <div class="fact"><dt>Autor</dt><dd>Eduardo Requia Souza</dd></div>
+      <div class="fact"><dt>Orientador</dt><dd>Alexandre Zamberlan</dd></div>
+    </dl>
+
+    <div class="meter">
+      <div class="meter-head">
+        <span><strong>4 de 8 fases concluídas.</strong> Fase 4 aguardando início.</span>
+        <span class="mono">53 testes verdes</span>
+      </div>
+      <div class="meter-track">
+        <div class="meter-cell" data-state="done" title="Fase 0 — concluída"></div>
+        <div class="meter-cell" data-state="done" title="Fase 1 — concluída"></div>
+        <div class="meter-cell" data-state="done" title="Fase 2 — concluída"></div>
+        <div class="meter-cell" data-state="done" title="Fase 3 — concluída"></div>
+        <div class="meter-cell" data-state="now"  title="Fase 4 — próxima"></div>
+        <div class="meter-cell" title="Fase 5"></div>
+        <div class="meter-cell" title="Fase 6"></div>
+        <div class="meter-cell" title="Fase 7"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <nav class="toc" aria-label="Sumário">
+      <h2>Nesta página</h2>
+      <ol>
+        <li><a href="#problema">O problema</a></li>
+        <li><a href="#arquitetura">Arquitetura</a></li>
+        <li><a href="#stack">Stack e versões</a></li>
+        <li><a href="#camadas">Camadas do código</a></li>
+        <li><a href="#erros">Contrato de erros</a></li>
+        <li><a href="#endpoints">Endpoints disponíveis</a></li>
+        <li><a href="#dominio">Modelo de domínio</a></li>
+        <li><a href="#enums">Enums e o dataset</a></li>
+        <li><a href="#vetor">O vetor de 39 atributos</a></li>
+        <li><a href="#fases">Roadmap por fases</a></li>
+        <li><a href="#decisoes">Decisões e trade-offs</a></li>
+        <li><a href="#rodar">Como rodar</a></li>
+        <li><a href="#pendencias">Pendências e riscos</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- ============================================================ -->
+      <section id="problema">
+        <h2>O problema</h2>
+        <p class="sec-note">Por que este backend existe.</p>
+
+        <p class="lede">Em ambientes de projeto de software, a composição de equipes costuma ser
+          feita manualmente, com base na percepção individual do gestor e na disponibilidade
+          imediata das pessoas. O resultado são times desnivelados — falta de competências
+          essenciais, sobreposição de funções, sobrecarga dos profissionais mais experientes.</p>
+
+        <p>O sistema ataca isso em duas frentes que se complementam. Um <strong>motor
+          preditivo</strong> calcula, para cada desenvolvedor, um escore de afinidade com o
+          projeto. Um <strong>modelo de linguagem</strong> traduz esse número em uma justificativa
+          legível, porque um escore sem explicação não sustenta uma decisão de alocação.</p>
+
+        <p>Este backend é a peça que amarra as duas. Ele não calcula o escore nem redige o texto:
+          ele guarda o domínio, monta o que cada serviço precisa receber, aplica as regras de
+          composição da equipe e devolve um resultado coerente.</p>
+
+        <h4>O que o sistema precisa responder</h4>
+        <ul>
+          <li>Dado um projeto com papéis, stack e criticidade definidos, <strong>quem</strong> deve compor a equipe?</li>
+          <li>A equipe sugerida <strong>cobre</strong> todos os papéis e tecnologias exigidos?</li>
+          <li>O time está <strong>nivelado</strong>, ou é só um bloco de júniores em um projeto crítico?</li>
+          <li>Quando dois projetos disputam a mesma pessoa, <strong>quem fica com ela</strong>?</li>
+          <li><strong>Por quê</strong> — em português, não em número.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="arquitetura">
+        <h2>Arquitetura</h2>
+        <p class="sec-note">Quatro peças, dois ecossistemas, um orquestrador.</p>
+
+        <p>A arquitetura é de microsserviços por uma razão concreta: o motor de predição vive no
+          ecossistema Python, onde estão as bibliotecas de aprendizado de máquina, enquanto a
+          lógica de negócio e a persistência vivem no ecossistema Java. Em vez de forçar os dois
+          no mesmo processo, cada um roda onde é forte e conversam por HTTP.</p>
+
+        <figure class="figure">
+          <svg viewBox="0 0 880 340" role="img" aria-label="Diagrama da arquitetura: o frontend React fala com o backend Spring Boot, que consulta o serviço FastAPI com PyCaret, a API do Gemini e o banco PostgreSQL.">
+            <!-- React -->
+            <rect class="svg-box" x="14" y="126" width="150" height="74" rx="4"></rect>
+            <text class="svg-t" x="89" y="156" text-anchor="middle">React</text>
+            <text class="svg-s" x="89" y="176" text-anchor="middle">frontend</text>
+
+            <!-- Backend (hero) -->
+            <rect class="svg-hero" x="264" y="104" width="196" height="118" rx="4"></rect>
+            <text class="svg-t" x="362" y="140" text-anchor="middle">Spring Boot</text>
+            <text class="svg-s" x="362" y="160" text-anchor="middle">orquestrador</text>
+            <text class="svg-s" x="362" y="178" text-anchor="middle">domínio · regras</text>
+            <text class="svg-s" x="362" y="196" text-anchor="middle">Java 21</text>
+
+            <!-- FastAPI -->
+            <rect class="svg-box" x="580" y="34" width="196" height="74" rx="4"></rect>
+            <text class="svg-t" x="678" y="64" text-anchor="middle">FastAPI + PyCaret</text>
+            <text class="svg-s" x="678" y="84" text-anchor="middle">motor de predição</text>
+
+            <!-- Gemini -->
+            <rect class="svg-box" x="580" y="218" width="196" height="74" rx="4"></rect>
+            <text class="svg-t" x="678" y="248" text-anchor="middle">API do Gemini</text>
+            <text class="svg-s" x="678" y="268" text-anchor="middle">via Spring AI</text>
+
+            <!-- PostgreSQL -->
+            <ellipse class="svg-box" cx="362" cy="288" rx="70" ry="11"></ellipse>
+            <path class="svg-box" d="M292 288 v24 a70 11 0 0 0 140 0 v-24"></path>
+            <text class="svg-t" x="362" y="330" text-anchor="middle">PostgreSQL</text>
+
+            <!-- React <-> Backend -->
+            <path class="svg-line" d="M164 163 H256" marker-end="url(#a)"></path>
+            <path class="svg-line" d="M256 178 H164" marker-end="url(#a)"></path>
+            <text class="svg-e" x="210" y="152" text-anchor="middle">JSON</text>
+
+            <!-- Backend -> FastAPI -->
+            <path class="svg-line" d="M460 140 C 520 140, 520 71, 572 71" marker-end="url(#a)"></path>
+            <text class="svg-e" x="516" y="96" text-anchor="middle">atributos</text>
+            <text class="svg-e" x="516" y="110" text-anchor="middle">→ escore</text>
+
+            <!-- Backend -> Gemini -->
+            <path class="svg-line" d="M460 190 C 520 190, 520 255, 572 255" marker-end="url(#a)"></path>
+            <text class="svg-e" x="516" y="212" text-anchor="middle">contexto</text>
+            <text class="svg-e" x="516" y="226" text-anchor="middle">→ texto</text>
+
+            <!-- Backend -> DB -->
+            <path class="svg-line" d="M362 222 V272" marker-end="url(#a)"></path>
+
+            <defs>
+              <marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 z" fill="var(--ink-3)"></path>
+              </marker>
+            </defs>
+          </svg>
+          <figcaption>O backend é o único ponto que fala com todos os outros. O React nunca chama
+            o motor de predição nem o Gemini diretamente — isso mantém as chaves de API fora do
+            navegador e concentra as regras em um lugar só.</figcaption>
+        </figure>
+
+        <h3>Quem faz o quê</h3>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr><th>Peça</th><th>Responsabilidade</th><th>Não faz</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>React</strong></td>
+                <td>Formulários, visualização do ranking, interface conversacional</td>
+                <td>Nenhuma regra de negócio</td>
+              </tr>
+              <tr>
+                <td><strong>Spring Boot</strong></td>
+                <td>Domínio, persistência, montagem do vetor de atributos, regras de composição, orquestração</td>
+                <td>Não calcula escore nem gera texto</td>
+              </tr>
+              <tr>
+                <td><strong>FastAPI + PyCaret</strong></td>
+                <td>Recebe atributos, devolve o escore de afinidade do modelo LightGBM</td>
+                <td>Não conhece o banco nem o conceito de equipe</td>
+              </tr>
+              <tr>
+                <td><strong>Gemini</strong></td>
+                <td>Na entrada, extrai parâmetros de texto livre; na saída, justifica a equipe</td>
+                <td>Não decide quem entra no time</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>As duas vias de entrada</h3>
+        <p>O trabalho prevê uma abordagem híbrida, e os dois caminhos convergem para a mesma
+          pipeline de recomendação:</p>
+        <ul>
+          <li><strong>Fluxo estruturado</strong> — o gestor preenche formulários; o React envia
+            JSON; o backend processa.</li>
+          <li><strong>Fluxo conversacional</strong> — o gestor descreve a necessidade em português;
+            o Gemini converte o texto em parâmetros de busca; a partir daí o caminho é idêntico.</li>
+        </ul>
+        <p>É por isso que a entidade <code>Recomendacao</code> guarda um campo
+          <code>origem</code>: as duas vias produzem o mesmo tipo de resultado, mas saber por qual
+          delas o gestor chegou é dado de pesquisa deste trabalho.</p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="stack">
+        <h2>Stack e versões</h2>
+        <p class="sec-note">Cada escolha com o motivo, não só a versão.</p>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Item</th><th>Versão</th><th>Por que esta</th></tr></thead>
+            <tbody>
+              <tr><td>Java</td><td class="num mono">21 LTS</td><td>Versão de suporte estendido; habilita <code>record</code> para DTOs imutáveis</td></tr>
+              <tr><td>Spring Boot</td><td class="num mono">3.5.16</td><td>Última da linha 3.x. Escolhida sobre a 4.x por compatibilidade com o Spring AI 1.1.x</td></tr>
+              <tr><td>Spring Data JPA</td><td class="num mono">—</td><td>Repositórios declarativos; menos SQL manual, mais consulta verificada na inicialização</td></tr>
+              <tr><td>PostgreSQL</td><td class="num mono">driver 42.x</td><td>SGBD definido na metodologia do trabalho</td></tr>
+              <tr><td>H2</td><td class="num mono">—</td><td>Perfil <code>dev</code>: sobe em memória, sem instalar nada</td></tr>
+              <tr><td>springdoc-openapi</td><td class="num mono">2.8.13</td><td>Swagger UI como contrato vivo entre backend e React</td></tr>
+              <tr><td>MapStruct</td><td class="num mono">1.6.3</td><td>Mapeia entidade ⇄ DTO gerando código em compilação; sem reflexão em produção</td></tr>
+              <tr><td>Lombok</td><td class="num mono">1.18.36</td><td>Remove <em>getters</em> e construtores repetitivos das entidades</td></tr>
+              <tr><td>Spring AI</td><td class="num mono">1.1.8</td><td>Entra na Fase 6, com o starter <code>google-genai</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note">
+          <p><strong>Sobre o Spring Boot 3 e não 4.</strong> O Spring Initializr já não gera
+            projetos 3.x, e o padrão hoje é a linha 4. Mesmo assim o projeto ficou no 3.5.16 por
+            dois motivos: é a versão declarada no texto do TFG, e o Spring AI 1.1.x — que fornece
+            a integração com o Gemini — tem como alvo o Boot 3.5. Adotar o Boot 4 exigiria o
+            Spring AI 2.x e criaria um risco de incompatibilidade justamente na Fase 6.</p>
+        </div>
+
+        <h4>Sobre o acesso ao Gemini</h4>
+        <p>O Spring AI oferece dois caminhos para os modelos do Google. O escolhido é
+          <code>spring-ai-starter-model-google-genai</code>, que fala com a <strong>API do
+          Gemini via chave de API</strong> — sem exigir conta na Google Cloud. A alternativa,
+          <code>vertex-ai-gemini</code>, roteia pela Vertex AI e demanda projeto configurado no
+          GCP, o que não se justifica em um protótipo acadêmico.</p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="camadas">
+        <h2>Camadas do código</h2>
+        <p class="sec-note">Onde cada coisa mora, e a regra que impede a mistura.</p>
+
+        <pre><code>br.ufn.tfg.teamrec
+├── <span class="k">config/</span>            <span class="c">CORS, OpenAPI, auditoria JPA, clientes HTTP</span>
+├── <span class="k">controller/</span>        <span class="c">REST — recebe, valida, delega. Nada além disso</span>
+├── <span class="k">service/</span>           <span class="c">regras de negócio; único lugar com @Transactional</span>
+├── <span class="k">domain/</span>
+│   ├── entity/        <span class="c">9 entidades JPA + EntidadeBase</span>
+│   ├── enums/         <span class="c">7 enums do domínio</span>
+│   └── repository/    <span class="c">5 repositórios, um por agregado</span>
+├── <span class="k">dto/</span>
+│   ├── request/       <span class="c">records de entrada + Bean Validation</span>
+│   └── response/      <span class="c">records de saída</span>
+├── <span class="k">mapper/</span>            <span class="c">MapStruct: entidade ⇄ DTO</span>
+├── <span class="k">integration/</span>
+│   ├── prediction/    <span class="c">cliente do motor de predição (Fase 4)</span>
+│   └── llm/           <span class="c">integração com o Gemini (Fase 6)</span>
+└── <span class="k">shared/exception/</span>  <span class="c">ApiError + GlobalExceptionHandler</span></code></pre>
+
+        <h3>O caminho de uma requisição</h3>
+        <ol>
+          <li>O <strong>controller</strong> recebe o JSON, que o Spring desserializa em um
+            <em>record</em> de request. O <code>@Valid</code> reprova o que estiver fora das
+            regras antes de qualquer código de negócio rodar.</li>
+          <li>O controller chama o <strong>service</strong> e não faz mais nada — sem
+            <code>try/catch</code>, sem consulta ao banco, sem lógica.</li>
+          <li>O <strong>service</strong> abre a transação, usa os <strong>repositórios</strong>
+            para carregar e gravar entidades, e aplica as regras.</li>
+          <li>O <strong>mapper</strong> converte a entidade em um record de response.</li>
+          <li>O controller devolve o record. A entidade JPA nunca chega ao JSON.</li>
+        </ol>
+
+        <h4>As quatro regras que sustentam isso</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Regra</th><th>O que ela evita</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Entidade nunca vira JSON</td>
+                <td>Vazar estrutura interna do banco na API e quebrar o React a cada refatoração</td>
+              </tr>
+              <tr>
+                <td><code>@Transactional</code> só no service</td>
+                <td>Transações abertas durante a serialização, prendendo conexão do pool</td>
+              </tr>
+              <tr>
+                <td><code>open-in-view: false</code></td>
+                <td>Consultas disparadas silenciosamente na hora de gerar o JSON</td>
+              </tr>
+              <tr>
+                <td>Um repositório por agregado</td>
+                <td>Alterar uma associativa por fora e deixar o objeto pai inconsistente</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>A terceira merece uma nota: com <code>open-in-view</code> ligado — que é o padrão do
+          Spring Boot — a sessão do Hibernate fica aberta até a resposta ser escrita, e coleções
+          preguiçosas são carregadas durante a serialização, uma consulta por item. Desligando,
+          o carregamento passa a ser explícito no service, com <code>JOIN FETCH</code>.</p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="erros">
+        <h2>Contrato de erros</h2>
+        <p class="sec-note">Um formato só, para o React não tratar cada rota de um jeito.</p>
+
+        <p>Toda falha passa por um <code>@RestControllerAdvice</code> e sai no mesmo formato.
+          Nenhum <em>stacktrace</em> chega ao cliente.</p>
+
+        <pre><code>{
+  <span class="k">"timestamp"</span>: "2026-09-06T19:46:18.748-03:00",
+  <span class="k">"status"</span>: 404,
+  <span class="k">"erro"</span>: "Nao encontrado",
+  <span class="k">"mensagem"</span>: "Rota inexistente: /api/nao-existe",
+  <span class="k">"caminho"</span>: "/api/nao-existe",
+  <span class="k">"campos"</span>: [ <span class="c">/* só em erro de validação */</span> ]
+}</code></pre>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Código</th><th>Quando</th><th>Exceção</th></tr></thead>
+            <tbody>
+              <tr><td class="num">400</td><td>Campo inválido, JSON malformado, parâmetro de tipo errado</td><td class="mono">MethodArgumentNotValid…</td></tr>
+              <tr><td class="num">404</td><td>Recurso ou rota inexistente</td><td class="mono">RecursoNaoEncontrado…</td></tr>
+              <tr><td class="num">405</td><td>Verbo HTTP não suportado</td><td class="mono">HttpRequestMethodNot…</td></tr>
+              <tr><td class="num">409</td><td>Registro duplicado ou em uso</td><td class="mono">DataIntegrityViolation…</td></tr>
+              <tr><td class="num">422</td><td>Requisição válida que viola regra do domínio</td><td class="mono">RegraDeNegocio…</td></tr>
+              <tr><td class="num">503</td><td>Motor de predição ou Gemini fora do ar</td><td class="mono">ServicoExterno…</td></tr>
+              <tr><td class="num">500</td><td>Qualquer falha não prevista, sem detalhes internos</td><td class="mono">Exception</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>A separação entre <strong>400</strong> e <strong>422</strong> é deliberada. Pedir uma
+          equipe de <code>-3</code> pessoas é um erro de formato: 400. Pedir uma equipe de 8
+          pessoas quando existem 3 desenvolvedores disponíveis é uma requisição bem formada que o
+          domínio recusa: 422. E o <strong>503</strong> existe para que a queda de um serviço de
+          apoio não derrube o backend inteiro.</p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="endpoints">
+        <h2>Endpoints disponíveis</h2>
+        <p class="sec-note">O que já responde hoje. Tudo navegável no Swagger UI.</p>
+
+        <h4>Catálogo de habilidades</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Rota</th><th>O quê</th><th>Respostas</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">GET /api/habilidades</td>
+                <td>Lista o catálogo. Parâmetros <code>tipo</code> e <code>apenasAtivas</code></td>
+                <td class="num">200</td>
+              </tr>
+              <tr>
+                <td class="mono">GET /api/habilidades/{id}</td>
+                <td>Busca uma habilidade</td>
+                <td class="num">200 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">POST /api/habilidades</td>
+                <td>Cadastra. Devolve o cabeçalho <code>Location</code></td>
+                <td class="num">201 · 400 · 409</td>
+              </tr>
+              <tr>
+                <td class="mono">PUT /api/habilidades/{id}</td>
+                <td>Atualiza</td>
+                <td class="num">200 · 400 · 404 · 409</td>
+              </tr>
+              <tr>
+                <td class="mono">DELETE /api/habilidades/{id}</td>
+                <td>Inativa logicamente</td>
+                <td class="num">204 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">POST /api/habilidades/{id}/reativacao</td>
+                <td>Reativa</td>
+                <td class="num">200 · 404</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Desenvolvedores</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Rota</th><th>O quê</th><th>Respostas</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">GET /api/desenvolvedores</td>
+                <td>Listagem paginada. Filtros <code>nome</code>, <code>senioridade</code>,
+                  <code>papel</code>, <code>ativo</code> — combináveis</td>
+                <td class="num">200</td>
+              </tr>
+              <tr>
+                <td class="mono">GET /api/desenvolvedores/{id}</td>
+                <td>Perfil completo, com as competências</td>
+                <td class="num">200 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">POST /api/desenvolvedores</td>
+                <td>Cadastra, já vinculando as competências</td>
+                <td class="num">201 · 400 · 404 · 409 · 422</td>
+              </tr>
+              <tr>
+                <td class="mono">PUT /api/desenvolvedores/{id}</td>
+                <td>Atualiza o perfil. A lista de competências <strong>substitui</strong> a anterior</td>
+                <td class="num">200 · 400 · 404 · 409 · 422</td>
+              </tr>
+              <tr>
+                <td class="mono">PATCH /api/desenvolvedores/{id}/disponibilidade</td>
+                <td>Ajusta só as horas semanais</td>
+                <td class="num">200 · 400 · 404 · 422</td>
+              </tr>
+              <tr>
+                <td class="mono">DELETE /api/desenvolvedores/{id}</td>
+                <td>Inativa logicamente</td>
+                <td class="num">204 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">POST /api/desenvolvedores/{id}/reativacao</td>
+                <td>Reativa</td>
+                <td class="num">200 · 404</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Projetos</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Rota</th><th>O quê</th><th>Respostas</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">GET /api/projetos</td>
+                <td>Listagem paginada. Filtros <code>nome</code>, <code>status</code>,
+                  <code>criticidade</code></td>
+                <td class="num">200</td>
+              </tr>
+              <tr>
+                <td class="mono">GET /api/projetos/{id}</td>
+                <td>Projeto completo, com papéis e stack exigidos</td>
+                <td class="num">200 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">POST /api/projetos</td>
+                <td>Cadastra com os requisitos</td>
+                <td class="num">201 · 400 · 404 · 409 · 422</td>
+              </tr>
+              <tr>
+                <td class="mono">PUT /api/projetos/{id}</td>
+                <td>Atualiza. Papéis e stack <strong>substituem</strong> os anteriores</td>
+                <td class="num">200 · 400 · 404 · 409 · 422</td>
+              </tr>
+              <tr>
+                <td class="mono">PATCH /api/projetos/{id}/status</td>
+                <td>Altera só o ciclo de vida</td>
+                <td class="num">200 · 400 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">DELETE /api/projetos/{id}</td>
+                <td>Cancela (exclusão lógica)</td>
+                <td class="num">204 · 404</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>As regras que o cadastro de projeto impõe</h4>
+        <p>Todas existem para impedir que uma especificação incoerente contamine as métricas
+          calculadas na Fase 5.</p>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Regra</th><th>Resposta</th><th>Por quê</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Vagas por papel não excedem o tamanho da equipe</td>
+                <td class="num">422</td>
+                <td>Somar mais tornaria a cobertura de papéis matematicamente inatingível</td>
+              </tr>
+              <tr>
+                <td>Somar <em>menos</em> é permitido</td>
+                <td class="num">201</td>
+                <td>São posições sem papel fixo, preenchidas por quem tiver melhor escore</td>
+              </tr>
+              <tr>
+                <td>Cada papel declarado uma única vez</td>
+                <td class="num">422</td>
+                <td>Duas quantidades para o mesmo papel são ambíguas</td>
+              </tr>
+              <tr>
+                <td>Término não anterior ao início</td>
+                <td class="num">422</td>
+                <td>Período invertido quebra o cálculo de janela de alocação</td>
+              </tr>
+              <tr>
+                <td>Tecnologia exigida existe e está ativa</td>
+                <td class="num">404 · 422</td>
+                <td>Requisito órfão inviabiliza a cobertura de tecnologias</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>O campo <code>vagasSemPapelFixo</code> devolvido pela API é a diferença entre o
+          tamanho da equipe e as vagas distribuídas. Maior que zero significa que parte do time
+          fica em aberto — informação que a Fase 5 usará ao montar a composição.</p>
+
+        <h4>Três decisões que aparecem no contrato</h4>
+        <p><strong>A normalização acontece no DTO, não no service.</strong> O Jackson constrói o
+          <em>record</em> e só então o Bean Validation examina os campos. Aparar e converter para
+          minúsculas dentro do <em>compact constructor</em> faz com que um e-mail colado com
+          espaço em volta seja aceito — se a limpeza ficasse no service, o <code>@Email</code> já
+          teria reprovado com 400.</p>
+
+        <p><strong>A listagem não traz as competências.</strong> Carregá-las para cada linha da
+          página dispararia uma consulta por desenvolvedor. Quem precisa da lista completa busca
+          o perfil pelo identificador.</p>
+
+        <p><strong>Duplicata é recusada, não resolvida em silêncio.</strong> Informar a mesma
+          habilidade duas vezes, com proficiências diferentes, devolve <strong>422</strong> em vez
+          de o backend escolher uma delas. Qualquer escolha automática gravaria algo diferente do
+          que o cliente pretendia. Vale para desenvolvedores e para projetos.</p>
+
+        <p><strong>O <code>PUT</code> substitui as competências, não acrescenta.</strong> É a
+          semântica que o formulário do frontend espera: o que está na tela é exatamente o que
+          fica gravado. Para mexer apenas nas horas existe o <code>PATCH</code>, que não corre o
+          risco de apagar a lista sem querer.</p>
+
+        <div class="note">
+          <p><strong>Carga inicial do catálogo.</strong> Controlada pela propriedade
+            <code>app.seed.catalogo</code>, ligada nos perfis <code>dev</code> e
+            <code>local</code>. É idempotente: nada acontece se o catálogo já tiver registros.
+            Sem ela não há como cadastrar competências que o motor de predição reconheça — um
+            vínculo criado à mão, com grafia divergente, produziria um vetor de atributos
+            silenciosamente incorreto.</p>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="dominio">
+        <h2>Modelo de domínio</h2>
+        <p class="sec-note">Nove tabelas. Cada relacionamento lido como uma frase.</p>
+
+        <div class="rels">
+          <div class="rel">
+            <span class="ent">Habilidade</span><span class="link">1 ──&lt;</span>
+            <span class="ent join">DesenvolvedorHabilidade</span><span class="link">&gt;── 1</span>
+            <span class="ent">Desenvolvedor</span>
+          </div>
+          <div class="rel">
+            <span class="ent">Habilidade</span><span class="link">1 ──&lt;</span>
+            <span class="ent join">ProjetoHabilidadeRequerida</span><span class="link">&gt;── 1</span>
+            <span class="ent">Projeto</span>
+          </div>
+          <div class="rel">
+            <span class="ent">Projeto</span><span class="link">1 ──&lt;</span>
+            <span class="ent join">ProjetoPapelRequerido</span>
+          </div>
+          <div class="rel">
+            <span class="ent">Desenvolvedor</span><span class="link">1 ──&lt;</span>
+            <span class="ent join">Alocacao</span><span class="link">&gt;── 1</span>
+            <span class="ent">Projeto</span>
+          </div>
+          <div class="rel">
+            <span class="ent">Projeto</span><span class="link">1 ──&lt;</span>
+            <span class="ent">Recomendacao</span><span class="link">1 ──&lt;</span>
+            <span class="ent join">RecomendacaoMembro</span><span class="link">&gt;── 1</span>
+            <span class="ent">Desenvolvedor</span>
+          </div>
+        </div>
+        <div class="legend">
+          <span><i class="swatch" style="background: var(--accent-soft); border: 1px solid var(--accent);"></i> tabela associativa</span>
+          <span><code>──&lt;</code> um para muitos</span>
+        </div>
+
+        <h3>As entidades</h3>
+        <div class="ents">
+          <div class="ecard">
+            <div class="ecard-h">Desenvolvedor</div>
+            <p>O profissional candidato. É o “item” que o sistema recomenda.</p>
+            <div class="fields">nome · email <em>único</em> · senioridade · papelPrincipal ·
+              softSkillsScore <em>0–5</em> · horasDisponiveis · ativo</div>
+          </div>
+          <div class="ecard">
+            <div class="ecard-h">Habilidade</div>
+            <p>Catálogo centralizado de competências. Impede que “React”, “ReactJS” e “react”
+              virem três entradas distintas.</p>
+            <div class="fields">nome <em>único</em> · tipo <em>HARD/SOFT</em> · categoria ·
+              chaveDataset · ativa</div>
+          </div>
+          <div class="ecard">
+            <div class="ecard-h">DesenvolvedorHabilidade</div>
+            <p>Vínculo com atributo próprio — a proficiência —, por isso é entidade e não um
+              N:N simples.</p>
+            <div class="fields">desenvolvedor · habilidade · proficiencia <em>1–5</em></div>
+          </div>
+          <div class="ecard">
+            <div class="ecard-h">Projeto</div>
+            <p>A demanda contra a qual os candidatos são avaliados.</p>
+            <div class="fields">nome · descricao · criticidade · status · tamanhoEquipe ·
+              horasSemanaisPorIntegrante · datas previstas</div>
+          </div>
+          <div class="ecard">
+            <div class="ecard-h">ProjetoPapelRequerido</div>
+            <p>Quantas vagas de cada papel. Base da métrica de cobertura de papéis.</p>
+            <div class="fields">projeto · papel · quantidade</div>
+          </div>
+          <div class="ecard">
+            <div class="ecard-h">ProjetoHabilidadeRequerida</div>
+            <p>A stack exigida. Base da métrica de cobertura de tecnologias.</p>
+            <div class="fields">projeto · habilidade · obrigatoria · peso <em>1–5</em></div>
+          </div>
+          <div class="ecard">
+            <div class="ecard-h">Recomendacao</div>
+            <p>Uma execução do motor. Cada rodada gera um registro novo; o histórico é dado de
+              pesquisa.</p>
+            <div class="fields">projeto · origem · consultaOriginal · justificativaLlm ·
+              coberturaPapeis · coberturaTecnologias · desvioPadraoSenioridade ·
+              desvioPadraoScore · scoreMedioEquipe · observacaoRestricao</div>
+          </div>
+          <div class="ecard">
+            <div class="ecard-h">RecomendacaoMembro</div>
+            <p>Uma posição no ranking. O ranking inteiro é gravado, não só os escolhidos.</p>
+            <div class="fields">recomendacao · desenvolvedor · scoreAfinidade · papelSugerido ·
+              posicaoRanking · selecionado</div>
+          </div>
+          <div class="ecard">
+            <div class="ecard-h">Alocacao</div>
+            <p>O compromisso <em>confirmado</em> pelo gestor. Só ela consome horas.</p>
+            <div class="fields">desenvolvedor · projeto · papel · horasSemanais · dataInicio ·
+              dataFim · ativa</div>
+          </div>
+        </div>
+
+        <div class="note">
+          <p><strong>Por que <code>Alocacao</code> e <code>RecomendacaoMembro</code> são coisas
+            diferentes.</strong> <code>RecomendacaoMembro</code> é uma <em>sugestão</em> do motor;
+            <code>Alocacao</code> é um compromisso <em>aceito</em>. Sem essa separação, o cenário
+            de avaliação “múltiplos projetos disputando os mesmos desenvolvedores” não teria como
+            ser resolvido: não haveria como saber quantas horas de cada pessoa já estão de fato
+            comprometidas.</p>
+        </div>
+
+        <h4>Por que o ranking inteiro é gravado</h4>
+        <p>Guardar só os selecionados economizaria linhas e custaria duas coisas. O gestor perderia
+          a informação de quem ficou de fora e por qual margem — que é exatamente o que ele precisa
+          para contestar a sugestão. E o modelo de linguagem perderia o contraste necessário para
+          explicar por que um perfil foi preterido em favor de outro.</p>
+
+        <h3>Duas decisões de persistência</h3>
+        <p><strong>Nada é apagado de verdade.</strong> Desenvolvedores e habilidades têm um campo
+          <code>ativo</code>. Uma exclusão física quebraria o histórico de recomendações que já
+          citam aquele registro.</p>
+        <p><strong>Escores são <code>BigDecimal</code>, não <code>double</code>.</strong> Um
+          <code>softSkillsScore</code> de <code>4.10</code> precisa voltar do banco como
+          <code>4.10</code>, não como <code>4.099999</code>. Há um teste travando exatamente
+          isso.</p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="enums">
+        <h2>Enums e o dataset</h2>
+        <p class="sec-note">Onde o domínio Java encosta na matriz de treinamento.</p>
+
+        <p>O modelo foi treinado sobre a <em>Stack Overflow Developer Survey 2024</em>, e as
+          colunas daquela matriz têm nomes literais como <code>Developer, back-end</code>. Se
+          esses nomes ficassem espalhados como texto solto pelo código, qualquer divergência de
+          grafia produziria um vetor de atributos silenciosamente errado — e o modelo não
+          reclamaria, apenas devolveria um escore ruim.</p>
+
+        <p>A solução foi guardar o rótulo dentro do próprio enum:</p>
+
+        <pre><code><span class="k">public enum</span> PapelAtuacao {
+    BACKEND  (<span class="k">"Developer, back-end"</span>,   <span class="k">"Backend"</span>),
+    FRONTEND (<span class="k">"Developer, front-end"</span>,  <span class="k">"Frontend"</span>),
+    FULLSTACK(<span class="k">"Developer, full-stack"</span>, <span class="k">"FullStack"</span>),
+    MOBILE   (<span class="k">"Developer, mobile"</span>,     <span class="k">"Mobile"</span>),
+    QA       (<span class="k">"Developer, QA or test"</span>, <span class="k">"QA / Testes"</span>),
+    DEVOPS   (<span class="k">"DevOps specialist"</span>,     <span class="k">"DevOps"</span>);
+    <span class="c">// chaveDataset ─┘                    └─ descricao (interface)</span>
+}</code></pre>
+
+        <p>Um teste automatizado verifica essa correspondência. Se alguém renomear uma chave, o
+          <em>build</em> quebra antes de o erro chegar ao motor de predição.</p>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Enum</th><th>Valores</th><th>Papel no modelo</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">Senioridade</td>
+                <td>JUNIOR · PLENO · SENIOR · ESPECIALISTA</td>
+                <td>Dado <strong>ordinal</strong>: expõe escala 1–4 crescente</td>
+              </tr>
+              <tr>
+                <td class="mono">PapelAtuacao</td>
+                <td>BACKEND · FRONTEND · FULLSTACK · MOBILE · QA · DEVOPS</td>
+                <td>Dado <strong>nominal</strong>: vira 6 colunas binárias</td>
+              </tr>
+              <tr>
+                <td class="mono">CriticidadeProjeto</td>
+                <td>BAIXA · MEDIA · ALTA</td>
+                <td>Nível 1–3; pondera senioridade e soft skills</td>
+              </tr>
+              <tr>
+                <td class="mono">TipoHabilidade</td>
+                <td>HARD · SOFT</td>
+                <td>Separa colunas binárias do escore consolidado</td>
+              </tr>
+              <tr>
+                <td class="mono">CategoriaHabilidade</td>
+                <td>LINGUAGEM · FRAMEWORK · BANCO_DE_DADOS · CLOUD · DEVOPS · MOBILE · COMPORTAMENTAL · OUTRA</td>
+                <td>Organização do catálogo na interface</td>
+              </tr>
+              <tr>
+                <td class="mono">StatusProjeto</td>
+                <td>PLANEJAMENTO · EM_ANDAMENTO · CONCLUIDO · CANCELADO</td>
+                <td>Define quais projetos consomem alocação</td>
+              </tr>
+              <tr>
+                <td class="mono">OrigemRecomendacao</td>
+                <td>FORMULARIO · CHAT</td>
+                <td>Registra por qual via o gestor chegou</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Todos são persistidos por <strong>nome</strong> (<code>EnumType.STRING</code>), nunca
+          por índice. Se um nível de senioridade for inserido no meio da lista amanhã, os registros
+          existentes continuam corretos.</p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="vetor">
+        <h2>O vetor de 39 atributos</h2>
+        <p class="sec-note">O que o backend vai enviar ao motor de predição na Fase 4.</p>
+
+        <p>A matriz de treinamento tem <strong>33.462 registros</strong> e <strong>39
+          colunas</strong>. Montar esse vetor a partir do banco é o trabalho central da Fase 4 —
+          e o modelo de domínio da Fase 1 foi desenhado para que a conversão seja quase
+          mecânica.</p>
+
+        <div class="vector">
+          <span class="vslot hi">Nivel_Senioridade</span>
+          <span class="vslot">Developer, back-end</span>
+          <span class="vslot">Developer, front-end</span>
+          <span class="vslot">Developer, full-stack</span>
+          <span class="vslot">Developer, mobile</span>
+          <span class="vslot">Developer, QA or test</span>
+          <span class="vslot">DevOps specialist</span>
+          <span class="vslot">Amazon Web Services (AWS)</span>
+          <span class="vslot">Angular</span>
+          <span class="vslot">C#</span>
+          <span class="vslot">Dart</span>
+          <span class="vslot">Django</span>
+          <span class="vslot">Docker</span>
+          <span class="vslot">FastAPI</span>
+          <span class="vslot">Flutter</span>
+          <span class="vslot">Go</span>
+          <span class="vslot">Google Cloud</span>
+          <span class="vslot">HTML/CSS</span>
+          <span class="vslot">Java</span>
+          <span class="vslot">JavaScript</span>
+          <span class="vslot">Kotlin</span>
+          <span class="vslot">Kubernetes</span>
+          <span class="vslot">Microsoft Azure</span>
+          <span class="vslot">Microsoft SQL Server</span>
+          <span class="vslot">MongoDB</span>
+          <span class="vslot">MySQL</span>
+          <span class="vslot">Next.js</span>
+          <span class="vslot">Node.js</span>
+          <span class="vslot">PostgreSQL</span>
+          <span class="vslot">Python</span>
+          <span class="vslot">React</span>
+          <span class="vslot">React Native</span>
+          <span class="vslot">Redis</span>
+          <span class="vslot">Spring Boot</span>
+          <span class="vslot">Swift</span>
+          <span class="vslot">TypeScript</span>
+          <span class="vslot">Vue.js</span>
+          <span class="vslot hi">Soft_Skills_Score</span>
+          <span class="vslot hi">Horas_Disponiveis</span>
+        </div>
+        <div class="legend">
+          <span><i class="swatch" style="background: var(--accent-soft); border: 1px solid var(--accent);"></i> valor contínuo ou ordinal</span>
+          <span><i class="swatch" style="background: var(--surface); border: 1px solid var(--line);"></i> coluna binária <span class="mono">0/1</span> — 6 papéis + 30 tecnologias</span>
+        </div>
+
+        <h4>Como cada posição é preenchida</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Posições</th><th>Origem no banco</th><th>Transformação</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="num">1</td>
+                <td class="mono">Desenvolvedor.senioridade</td>
+                <td>Enum → <code>getValorOrdinal()</code>, escala 1–4</td>
+              </tr>
+              <tr>
+                <td class="num">2–7</td>
+                <td class="mono">Desenvolvedor.papelPrincipal</td>
+                <td><em>One-hot</em>: 1 na coluna do papel, 0 nas outras cinco</td>
+              </tr>
+              <tr>
+                <td class="num">8–37</td>
+                <td class="mono">DesenvolvedorHabilidade</td>
+                <td>Proficiência &gt; 0 vira 1, casando por <code>chaveDataset</code></td>
+              </tr>
+              <tr>
+                <td class="num">38</td>
+                <td class="mono">Desenvolvedor.softSkillsScore</td>
+                <td>Valor direto, 0,00 a 5,00</td>
+              </tr>
+              <tr>
+                <td class="num">39</td>
+                <td class="mono">horasDisponiveis − horas alocadas</td>
+                <td>Disponibilidade <strong>real</strong>, descontando compromissos ativos</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>A última linha é a mais importante. A disponibilidade enviada ao modelo não é o campo
+          bruto do cadastro: é o campo <em>menos</em> as horas já comprometidas em projetos
+          ativos. É isso que faz uma pessoa já lotada em dois projetos cair naturalmente no
+          ranking, sem nenhuma regra especial.</p>
+
+        <div class="note warn">
+          <p><strong>Contrato ainda não fechado.</strong> O formato exato de requisição e resposta
+            do serviço FastAPI — nomes dos campos JSON, se aceita um lote de candidatos ou um por
+            vez, se recebe também os atributos do projeto — depende do arquivo do modelo, que
+            ainda não está disponível. A Fase 4 começa por definir esse contrato.</p>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="fases">
+        <h2>Roadmap por fases</h2>
+        <p class="sec-note">A numeração é a ordem real de execução: cada fase depende da anterior.</p>
+
+        <div class="phases">
+
+          <div class="phase" data-state="done">
+            <div class="phase-n">0</div>
+            <div class="phase-b">
+              <div class="phase-t"><h3>Esqueleto e infraestrutura</h3><span class="pill" data-state="done">Concluída</span></div>
+              <p>A base sobre a qual tudo é construído, verificada rodando de verdade.</p>
+              <ul>
+                <li>Projeto Maven com <em>wrapper</em> — não exige Maven instalado</li>
+                <li>Perfis <code>dev</code> (H2 em memória) e <code>local</code> (PostgreSQL)</li>
+                <li>Swagger UI, Actuator, CORS externalizado</li>
+                <li><code>GlobalExceptionHandler</code> cobrindo 7 classes de erro</li>
+                <li>Segredos apenas por variável de ambiente</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="phase" data-state="done">
+            <div class="phase-n">1</div>
+            <div class="phase-b">
+              <div class="phase-t"><h3>Modelo de domínio</h3><span class="pill" data-state="done">Concluída</span></div>
+              <p>A decisão mais cara de reverter, por isso feita antes de qualquer endpoint.</p>
+              <ul>
+                <li>9 entidades, 7 enums, 5 repositórios</li>
+                <li><code>EntidadeBase</code> com auditoria e <code>equals/hashCode</code> corretos para JPA</li>
+                <li>Consulta de horas comprometidas em lote, evitando N+1</li>
+                <li>10 testes de persistência contra banco real</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="phase" data-state="done">
+            <div class="phase-n">2</div>
+            <div class="phase-b">
+              <div class="phase-t"><h3>Cadastro de desenvolvedores e habilidades</h3><span class="pill" data-state="done">Concluída</span></div>
+              <p>Primeira fatia vertical completa: controller, service, mapper, DTO e repositório.
+                Define o padrão que as fases seguintes repetem.</p>
+              <ul>
+                <li>13 endpoints REST, documentados no Swagger</li>
+                <li>Carga inicial do catálogo com as 30 tecnologias do dataset e 8 soft skills</li>
+                <li>Envelope de paginação próprio, com filtros combináveis</li>
+                <li>Exclusão lógica com reativação, preservando o histórico</li>
+                <li>27 testes de integração atravessando todas as camadas</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="phase" data-state="done">
+            <div class="phase-n">3</div>
+            <div class="phase-b">
+              <div class="phase-t"><h3>Cadastro de projetos e requisitos</h3><span class="pill" data-state="done">Concluída</span></div>
+              <p>Fecha a via de entrada estruturada: sem projeto cadastrado não há o que recomendar.</p>
+              <ul>
+                <li>6 endpoints REST, com listagem paginada e filtros</li>
+                <li>Papéis exigidos e stack requerida, com peso e obrigatoriedade</li>
+                <li>Validação cruzada: vagas por papel <em>versus</em> tamanho da equipe</li>
+                <li>Cancelamento como exclusão lógica, preservando o histórico</li>
+                <li>14 testes de integração</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="phase" data-state="now">
+            <div class="phase-n">4</div>
+            <div class="phase-b">
+              <div class="phase-t"><h3>Integração com o motor de predição</h3><span class="pill" data-state="now">Próxima</span></div>
+              <p>A primeira travessia entre os dois ecossistemas.</p>
+              <ul>
+                <li>Cliente HTTP com <em>timeout</em> e tratamento de indisponibilidade</li>
+                <li>Montagem do vetor de 39 atributos a partir do banco</li>
+                <li><code>POST /api/projetos/{id}/recomendacoes</code> devolvendo o ranking</li>
+                <li>Persistência da execução e do ranking completo</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-n">5</div>
+            <div class="phase-b">
+              <div class="phase-t"><h3>Regras de composição da equipe</h3><span class="pill">Planejada</span></div>
+              <p>Onde as métricas do trabalho deixam de ser texto e viram código executável.</p>
+              <ul>
+                <li>Cobertura de papéis e cobertura de tecnologias</li>
+                <li>Dispersão: desvio padrão de senioridade e de escore</li>
+                <li>Conflito de alocação entre projetos simultâneos</li>
+                <li>Cenário de escassez: montar a melhor equipe possível e registrar a restrição</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-n">6</div>
+            <div class="phase-b">
+              <div class="phase-t"><h3>Interface conversacional</h3><span class="pill">Planejada</span></div>
+              <p>Spring AI e Gemini, no papel duplo previsto na metodologia.</p>
+              <ul>
+                <li><strong>Na saída:</strong> justificativa em linguagem natural da equipe sugerida</li>
+                <li><strong>Na entrada:</strong> extração de parâmetros a partir de texto livre</li>
+                <li><em>System prompts</em> versionados junto do código</li>
+                <li>Endpoint de conversa com histórico</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-n">7</div>
+            <div class="phase-b">
+              <div class="phase-t"><h3>Fechamento</h3><span class="pill">Planejada</span></div>
+              <p>O que transforma o protótipo em algo que a banca consegue executar.</p>
+              <ul>
+                <li>Testes de integração ponta a ponta</li>
+                <li><code>Dockerfile</code> e <code>docker-compose</code> com o PostgreSQL</li>
+                <li>Carga de dados dos cenários de avaliação</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="decisoes">
+        <h2>Decisões e trade-offs</h2>
+        <p class="sec-note">Inclusive as que foram tomadas contra a recomendação inicial.</p>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Decisão</th><th>Alternativa</th><th>Consequência</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Spring Boot 3.5.16</td>
+                <td>Boot 4.x</td>
+                <td>Bate com o texto do TFG e garante o Spring AI na Fase 6</td>
+              </tr>
+              <tr>
+                <td><code>ddl-auto: update</code></td>
+                <td>Flyway versionado</td>
+                <td>Mais rápido agora; o esquema não fica versionado. Flyway pode ser plugado depois sem refazer o domínio</td>
+              </tr>
+              <tr>
+                <td>Sem autenticação</td>
+                <td>Spring Security + JWT</td>
+                <td>Reduz o escopo do protótipo. Os três atores existem no caso de uso, mas não são impostos pelo backend</td>
+              </tr>
+              <tr>
+                <td>Exclusão lógica</td>
+                <td><code>DELETE</code> físico</td>
+                <td>O histórico de recomendações permanece íntegro</td>
+              </tr>
+              <tr>
+                <td>Ranking completo gravado</td>
+                <td>Só os selecionados</td>
+                <td>Mais linhas no banco, em troca de transparência e contexto para o LLM</td>
+              </tr>
+              <tr>
+                <td>H2 no perfil <code>dev</code></td>
+                <td>Só PostgreSQL</td>
+                <td>Roda sem instalar nada; exige conferir o esquema no Postgres antes da entrega</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note warn">
+          <p><strong>Sobre o <code>ddl-auto</code> e a ausência de autenticação.</strong> As duas
+            foram escolhas conscientes de escopo, não esquecimentos. Vale ter a resposta pronta
+            caso a banca pergunte: o esquema é derivado das entidades, e o controle de acesso está
+            modelado no caso de uso mas não implementado neste protótipo.</p>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="rodar">
+        <h2>Como rodar</h2>
+        <p class="sec-note">Não é preciso instalar Maven — o projeto traz o <em>wrapper</em>.</p>
+
+        <h4>Perfil dev — H2 em memória, zero instalação</h4>
+        <pre><code>cd backend
+./mvnw spring-boot:run</code></pre>
+
+        <h4>Perfil local — PostgreSQL</h4>
+        <pre><code><span class="k">export</span> DB_PASSWORD=sua-senha
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local</code></pre>
+
+        <h4>Testes</h4>
+        <pre><code>./mvnw test   <span class="c"># 53 testes: contexto, persistência, catálogo e API</span></code></pre>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Endereço</th><th>O quê</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">localhost:8080/swagger-ui.html</td><td>Documentação interativa da API</td></tr>
+              <tr><td class="mono">localhost:8080/v3/api-docs</td><td>Contrato OpenAPI em JSON</td></tr>
+              <tr><td class="mono">localhost:8080/actuator/health</td><td>Verificação de saúde</td></tr>
+              <tr><td class="mono">localhost:8080/h2-console</td><td>Console do banco — só no perfil <code>dev</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Configuração</h4>
+        <p>Copie <code>.env.example</code> para <code>.env</code> e preencha. Nenhum segredo é
+          versionado: <code>DB_PASSWORD</code>, <code>GEMINI_API_KEY</code>,
+          <code>PREDICTION_BASE_URL</code> e <code>APP_CORS_ORIGINS</code> vêm todos do ambiente.</p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="pendencias">
+        <h2>Pendências e riscos</h2>
+        <p class="sec-note">O que ainda não foi verificado, dito com todas as letras.</p>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Item</th><th>Situação</th><th>Quando resolve</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Arquivo do modelo treinado</td>
+                <td>Não localizado na máquina; a pasta <code>api_motor_predicao</code> está vazia</td>
+                <td>Bloqueia a Fase 4</td>
+              </tr>
+              <tr>
+                <td>Serviço FastAPI</td>
+                <td>Contrato de entrada e saída ainda não definido</td>
+                <td>Início da Fase 4</td>
+              </tr>
+              <tr>
+                <td>Esquema no PostgreSQL real</td>
+                <td>Validado apenas em H2 no modo PostgreSQL</td>
+                <td>Assim que o banco for instalado</td>
+              </tr>
+              <tr>
+                <td>Chave da API do Gemini</td>
+                <td>Ainda não provisionada</td>
+                <td>Antes da Fase 6</td>
+              </tr>
+              <tr>
+                <td>Chave da Groq no projeto antigo</td>
+                <td>Exposta em texto puro em <code>IdeaProjects</code></td>
+                <td><strong>Revogar agora</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Nenhum desses itens bloqueia as Fases 2 e 3, que dependem apenas do modelo de domínio
+          já concluído.</p>
+      </section>
+
+      <footer>
+        <p>Documentação do módulo backend · Sistema Web de Recomendação para Formação de Equipes
+          em Projetos de Desenvolvimento de Software · Universidade Franciscana, Santa Maria — RS.
+          Reflete o estado do código ao final da Fase 3.</p>
+      </footer>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// Destaca no sumário a seção que está sendo lida.
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  if (!('IntersectionObserver' in window) || !sections.length) return;
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      var link = map[entry.target.id];
+      if (!link) return;
+      if (entry.isIntersecting) {
+        links.forEach(function (other) { other.classList.remove('on'); });
+        link.classList.add('on');
+      }
+    });
+  }, { rootMargin: '-10% 0px -70% 0px', threshold: 0 });
+
+  sections.forEach(function (section) { observer.observe(section); });
+})();
+</script>
+</body>
+</html>

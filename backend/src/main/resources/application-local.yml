@@ -1,0 +1,28 @@
+# ---------------------------------------------------------------------------
+# Perfil "local": PostgreSQL, o SGBD definido no TFG.
+# Ativar com:  --spring.profiles.active=local
+# A senha vem de variavel de ambiente (DB_PASSWORD), nunca do arquivo.
+# ---------------------------------------------------------------------------
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/teamrec}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      # Hibernate ajusta o schema a partir das entidades.
+      # Trocar por Flyway caso o versionamento do schema passe a ser exigido.
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    # Desligado de proposito: forca o carregamento explicito no service,
+    # evitando LazyInitializationException e consultas escondidas na serializacao.
+    open-in-view: false
+
+# Carga inicial do catalogo de habilidades (idempotente: so roda com o catalogo vazio)
+app:
+  seed:
+    catalogo: true
