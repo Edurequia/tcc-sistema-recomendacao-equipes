@@ -8,6 +8,10 @@ package br.ufn.tfg.teamrec.domain.enums;
  * motor de predicao (coluna "Nivel_Senioridade" da matriz de treinamento),
  * e tambem serve de base para o calculo de dispersao de senioridade da equipe.
  *
+ * Os tres niveis sao exatamente os do treinamento. Um quarto nivel nao teria
+ * efeito algum: o modelo so viu valores de 1 a 3 e trataria qualquer valor
+ * maior como senior, sem aviso.
+ *
  * O enum e persistido por NOME (EnumType.STRING), nunca por indice, para que
  * a insercao de um novo nivel no futuro nao corrompa os registros existentes.
  */
@@ -15,8 +19,7 @@ public enum Senioridade {
 
     JUNIOR(1, "Junior"),
     PLENO(2, "Pleno"),
-    SENIOR(3, "Senior"),
-    ESPECIALISTA(4, "Especialista");
+    SENIOR(3, "Senior");
 
     private final int valorOrdinal;
     private final String descricao;

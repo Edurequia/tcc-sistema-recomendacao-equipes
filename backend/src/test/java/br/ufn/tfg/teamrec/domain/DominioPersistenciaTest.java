@@ -255,11 +255,11 @@ class DominioPersistenciaTest {
     }
 
     @Test
-    @DisplayName("a senioridade expoe escala ordinal crescente")
+    @DisplayName("a senioridade expoe escala ordinal crescente de 1 a 3, a mesma do treinamento")
     void senioridadeDeveSerOrdinalCrescente() {
         assertThat(List.of(Senioridade.values()))
                 .extracting(Senioridade::getValorOrdinal)
-                .containsExactly(1, 2, 3, 4);
+                .containsExactly(1, 2, 3);
     }
 
     // ------------------------------------------------------------------

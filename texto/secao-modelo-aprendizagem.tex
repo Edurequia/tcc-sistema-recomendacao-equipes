@@ -1,0 +1,56 @@
+Para o desenvolvimento do motor preditivo responsável por sugerir a formação das equipes, adotou-se uma abordagem fundamentada em técnicas de Aprendizado de Máquina. A base de dados primária foi extraída dos resultados públicos da Stack Overflow Developer Survey 2024.
+
+O processamento analítico inicial consistiu na filtragem dos dados, selecionando profissionais cujas áreas de atuação fossem aderentes ao escopo de projetos de software, tais como \textit{backend}, \textit{frontend}, \textit{full-stack}, \textit{mobile}, garantia de qualidade (QA) e operações (DevOps). Após a filtragem por área de atuação, o conjunto de dados resultante reuniu 33.462 registros de profissionais.
+
+Em seguida, foram aplicadas técnicas para transformar os dados qualitativos brutos em variáveis quantitativas processáveis pelo algoritmo. As competências técnicas e os papéis de atuação (\textit{hard skills}) reais dos desenvolvedores foram convertidos em matrizes binárias, enquanto o nível de experiência foi mapeado para uma escala ordinal crescente de três níveis (júnior, pleno e sênior), estabelecendo a relação de senioridade.
+
+No entanto, a base pública não contemplava informações sobre competências comportamentais (\textit{soft skills}) e disponibilidade de carga horária. Para viabilizar a análise desses atributos, aplicou-se a injeção de dados sintéticos. Para que esses dados fossem plausíveis, os valores foram gerados com base no modelo estatístico de curva normal, em uma escala de 0 a 5 para as competências comportamentais e de 0 a 60 horas semanais para a disponibilidade. Essa abordagem garantiu que a maioria dos profissionais recebesse notas e cargas horárias próximas a uma média realista, com uma incidência menor de casos extremos, simulando a distribuição de perfis em um ambiente corporativo. No caso da carga horária, a geração contemplou também profissionais com pouca ou nenhuma disponibilidade, de modo que o algoritmo pudesse aprender o impacto da falta de tempo sobre a alocação.
+
+Como os algoritmos de aprendizagem supervisionada demandam dados históricos para o treinamento, realizou-se uma simulação cruzando os perfis dos desenvolvedores com cenários de projetos fictícios. Cada cenário recebeu um tipo de demanda (\textit{backend}, \textit{frontend} ou ambos), uma carga horária semanal exigida de cada integrante e uma lista de tecnologias requeridas, sorteadas de acordo com a popularidade de cada tecnologia na pesquisa, cada uma acompanhada de um peso de importância de 1 a 5. Esses cenários também foram classificados de acordo com a sua complexidade, cujos níveis de criticidade foram definidos da seguinte forma:
+
+\begin{itemize}
+    \item \textbf{Criticidade Baixa (Nível 1):} Projetos com foco no atendimento das competências técnicas (\textit{hard skills}) e papéis exigidos.
+    \item \textbf{Criticidade Média (Nível 2):} Projetos intermediários, que exigem um balanceamento padrão entre as habilidades técnicas e o perfil comportamental.
+    \item \textbf{Criticidade Alta (Nível 3):} Projetos complexos e de alto risco, nos quais o nível de experiência (senioridade) e as competências comportamentais (\textit{soft skills}) recebem multiplicadores de peso mais elevados para garantir a estabilidade da entrega.
+\end{itemize}
+
+Para viabilizar o treinamento, foi definida uma variável alvo, denominada \textit{escore de afinidade}. Como a base de dados pública não possuía um histórico real de sucesso de alocações, esse escore precisou ser calculado de forma sintética para cada par de desenvolvedor e projeto.
+
+Como a afinidade depende tanto do desenvolvedor quanto do projeto, duas medidas foram calculadas para cada par. A primeira é a \textit{aderência técnica}, que corresponde à proporção dos pesos das tecnologias exigidas que o profissional domina. A segunda é a \textit{cobertura de horas}, que indica quanto da carga semanal exigida pelo projeto o profissional consegue atender, limitada ao valor máximo de 1. Dessa forma, as trinta colunas de tecnologias extraídas da pesquisa deixam de ser analisadas isoladamente e passam a ser resumidas na aderência técnica, que expressa o quanto o conhecimento do profissional atende à necessidade real do projeto.
+
+A lógica para a geração desse escore baseou-se no alinhamento direto com as regras de negócio: a nota do candidato é calculada a partir de suas características, mas os pesos de cada atributo mudam dependendo da criticidade do projeto. Por exemplo, em um cenário de Criticidade Alta, os multiplicadores da senioridade e das \textit{soft skills} recebem valores maiores, enquanto o peso da aderência técnica diminui. O papel de atuação também é considerado: o profissional cujo papel corresponde exatamente ao exigido recebe a pontuação máxima nesse quesito, enquanto papéis próximos, como um \textit{full-stack} em um projeto exclusivamente de \textit{backend}, recebem uma pontuação parcial. Além disso, para evitar que o algoritmo de aprendizado de máquina apenas decorasse uma regra exata e para simular a imprevisibilidade do fator humano, injetou-se uma margem de ruído estatístico nos resultados.
+
+Toda essa lógica de pontuação que originou a base de treinamento foi formalizada matematicamente conforme a Equação 1:
+
+\begin{equation}
+S(d, p) = w_p \cdot P(d, p) + w_t(c) \cdot T(d, p) + w_s(c) \cdot N(d) + w_c(c) \cdot C(d) + w_h \cdot H(d, p) + \varepsilon
+\end{equation}
+
+Na qual $S(d, p)$ representa o escore de afinidade do desenvolvedor $d$ em relação ao projeto $p$; $P(d, p)$ a aderência do papel de atuação, que vale 1 para o papel exato, 0,7 para papéis próximos e 0 para os demais; $T(d, p)$ a aderência técnica; $N(d)$ a senioridade normalizada; $C(d)$ as competências comportamentais normalizadas; $H(d, p)$ a cobertura de horas; e $\varepsilon$ o termo de ruído aleatório, com média zero e desvio padrão de 4 pontos. Todos os componentes foram colocados na mesma escala, de 0 a 1, de modo que cada peso ($w$) represente a pontuação máxima que o atributo pode somar. Os pesos variam de acordo com a criticidade ($c$) do cenário e totalizam 100 pontos, conforme a Tabela~\ref{tab:pesos}.
+
+\begin{table}[htbp]
+\centering
+\caption{Pesos de cada componente do escore de afinidade conforme a criticidade do projeto}
+\label{tab:pesos}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccccc}
+\hline
+\textbf{Criticidade} & \textbf{Papel} ($w_p$) & \textbf{Técnica} ($w_t$) & \textbf{Senioridade} ($w_s$) & \textbf{Comportamental} ($w_c$) & \textbf{Disponibilidade} ($w_h$) \\
+\hline
+Baixa (Nível 1) & 25 & 30 & 15 & 15 & 15 \\
+Média (Nível 2) & 25 & 25 & 20 & 15 & 15 \\
+Alta (Nível 3)  & 25 & 15 & 25 & 20 & 15 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+Ao final da simulação, cada registro do conjunto de treinamento passou a ser descrito por 13 variáveis de entrada: a senioridade, os seis papéis de atuação, as competências comportamentais, a criticidade do projeto, os requisitos de \textit{backend} e \textit{frontend}, a aderência técnica e a cobertura de horas.
+
+O treinamento e a avaliação dos modelos preditivos ocorreram em ambiente Python, utilizando a biblioteca PyCaret como ferramenta de \textit{benchmark}. Os dados foram divididos em 80\% para treinamento e 20\% para teste, e cada algoritmo foi avaliado por validação cruzada em 10 partições. A plataforma comparou múltiplos algoritmos de regressão, e o modelo Light Gradient Boosting Machine (LightGBM) foi selecionado por apresentar o menor Erro Quadrático Médio (RMSE). Em seguida, seus hiperparâmetros foram otimizados, alcançando RMSE de \textbf{[PREENCHER]} e Coeficiente de Determinação ($R^2$) de \textbf{[PREENCHER]}\footnote{O RMSE quantifica a magnitude média dos erros preditivos, penalizando desvios acentuados e mantendo a escala original dos dados. O $R^2$ (Coeficiente de Determinação) mede o grau de aprendizado do algoritmo, variando de 0 a 1.}. O procedimento utilizou as bibliotecas PyCaret 3.3.2, scikit-learn 1.4.2 e LightGBM 4.6.0.
+
+Como o ruído inserido possui desvio padrão de 4 pontos, um RMSE próximo desse valor indica que o erro restante corresponde ao próprio ruído, que por definição não pode ser previsto. Para confirmar esse comportamento, as previsões do modelo foram comparadas com a fórmula sem ruído em 3.000 casos, obtendo-se um erro médio absoluto de 1,08 ponto, o que demonstra que o algoritmo aprendeu a lógica de pontuação em vez de apenas memorizar os exemplos.
+
+Ao final do processo de avaliação, o algoritmo vencedor foi consolidado, gerando um modelo de reconhecimento executável, atuando como o motor de raciocínio da aplicação.
+
+Cabe registrar, como limitação do modelo, a natureza sintética da variável dependente. Devido à indisponibilidade de bases públicas com o histórico real de sucesso de equipes, o algoritmo foi treinado para aproximar a função lógica de alocação proposta por este trabalho, demonstrando viabilidade técnica que poderá ser validada em ambientes organizacionais reais em trabalhos futuros.

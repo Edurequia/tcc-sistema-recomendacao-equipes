@@ -1,0 +1,21 @@
+# Motor de predicao do TeamRec - Python 3.10
+#
+# As versoes de ML sao as do ambiente de treinamento: o .pkl e um pipeline
+# serializado e so e restaurado de forma confiavel com as mesmas bibliotecas.
+# ATENCAO: lightgbm 4.7.0 (instalado por padrao junto do pycaret) derruba o
+# processo ao prever com este modelo. Mantenha 4.6.0.
+pycaret==3.3.2
+scikit-learn==1.4.2
+lightgbm==4.6.0
+numpy==1.26.4
+pandas==2.1.4
+joblib==1.3.2
+
+# API
+fastapi==0.115.14
+pydantic==2.11.9
+uvicorn==0.34.3
+
+# Testes
+pytest==8.4.2
+httpx==0.28.1

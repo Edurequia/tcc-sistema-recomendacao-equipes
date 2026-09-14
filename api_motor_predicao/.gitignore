@@ -1,0 +1,8 @@
+# Modelo treinado: distribuido fora do repositorio (ver README)
+*.pkl
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+logs.log

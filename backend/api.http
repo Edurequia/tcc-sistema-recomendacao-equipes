@@ -316,6 +316,49 @@ Content-Type: application/json
 
 
 ### =========================================================================
+### RECOMENDAÇÕES — exige o motor de predição rodando na porta 8000
+### =========================================================================
+
+### 28a. (*) Gerar recomendação: ranking completo dos desenvolvedores ativos
+# @name recomendacao
+POST {{host}}/api/projetos/{{idProjeto}}/recomendacoes
+
+> {%
+    client.global.set("idRecomendacao", response.body.id);
+    client.test("ranking ordenado por escore", function() {
+        const r = response.body.ranking;
+        for (let i = 1; i < r.length; i++) {
+            client.assert(r[i - 1].scoreAfinidade >= r[i].scoreAfinidade);
+        }
+    });
+%}
+
+### 28b. Consultar a recomendação gravada
+GET {{host}}/api/recomendacoes/{{idRecomendacao}}
+
+### 28c. Histórico de recomendações do projeto
+GET {{host}}/api/projetos/{{idProjeto}}/recomendacoes
+
+### 28c2. Linha de base: a equipe proposta contra 100 equipes sorteadas entre os elegíveis
+GET {{host}}/api/recomendacoes/{{idRecomendacao}}/linha-base?sorteios=100&semente=42
+
+### 28d. Confirmar a equipe proposta: aloca os selecionados no projeto
+POST {{host}}/api/recomendacoes/{{idRecomendacao}}/confirmacao
+
+### 28e. Equipe alocada no projeto
+GET {{host}}/api/projetos/{{idProjeto}}/alocacoes
+
+### 28f. Alocação manual — 422 se faltar hora livre; 409 se a Ana já foi alocada pela confirmação
+POST {{host}}/api/projetos/{{idProjeto}}/alocacoes
+Content-Type: application/json
+
+{
+  "desenvolvedorId": {{idAna}},
+  "horasSemanais": 60
+}
+
+
+### =========================================================================
 ### EXCLUSÃO LÓGICA — nada some de verdade
 ### =========================================================================
 

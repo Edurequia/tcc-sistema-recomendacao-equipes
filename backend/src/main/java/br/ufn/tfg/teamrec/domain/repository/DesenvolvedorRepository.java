@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,4 +72,13 @@ public interface DesenvolvedorRepository extends JpaRepository<Desenvolvedor, Lo
             order by d.nome asc
             """)
     List<Desenvolvedor> buscarAtivosComHabilidades();
+
+    /** Varios perfis com as competencias em uma consulta, ativos ou nao. */
+    @Query("""
+            select distinct d from Desenvolvedor d
+            left join fetch d.habilidades dh
+            left join fetch dh.habilidade
+            where d.id in :ids
+            """)
+    List<Desenvolvedor> buscarComHabilidadesPorIds(@Param("ids") Collection<Long> ids);
 }

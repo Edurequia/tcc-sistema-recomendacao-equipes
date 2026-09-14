@@ -55,6 +55,19 @@ public class RecomendacaoMembro extends EntidadeBase {
     @Column(nullable = false)
     private boolean selecionado;
 
+    /**
+     * Features relacionais enviadas ao motor no momento da geracao, de 0 a 1.
+     *
+     * Gravadas porque dependem do projeto e das alocacoes daquele instante:
+     * sem elas, o escore persistido deixaria de ser explicavel assim que o
+     * perfil ou a agenda do desenvolvedor mudassem.
+     */
+    @Column(name = "aderencia_tecnica", precision = 5, scale = 4)
+    private BigDecimal aderenciaTecnica;
+
+    @Column(name = "cobertura_horas", precision = 5, scale = 4)
+    private BigDecimal coberturaHoras;
+
     public RecomendacaoMembro(Desenvolvedor desenvolvedor, BigDecimal scoreAfinidade,
                               PapelAtuacao papelSugerido, Integer posicaoRanking, boolean selecionado) {
         this.desenvolvedor = desenvolvedor;

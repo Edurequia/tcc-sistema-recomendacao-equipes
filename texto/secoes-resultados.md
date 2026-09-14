@@ -38,7 +38,7 @@ de afinidade permanecesse isolado no ecossistema Python, onde estão as bibliote
 aprendizado de máquina, enquanto a lógica de composição das equipes e a persistência
 permanecessem no ecossistema Java. Essa separação também determina que a interface de
 usuário não acesse diretamente nem o serviço de predição nem a API do modelo de
-linguagem: todas as requisições são intermediadas pelo orquestrador.
+linguagem: todas as requisições são intermediadas pelo backend.
 
 ### Modelagem relacional
 

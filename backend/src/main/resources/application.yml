@@ -1,13 +1,18 @@
 # ---------------------------------------------------------------------------
 # Configuracao comum a todos os perfis.
-# O perfil ativo define o banco: "dev" (H2 em memoria) ou "local" (PostgreSQL).
-# Nenhum segredo deve ser escrito neste arquivo - use variaveis de ambiente.
+# O perfil ativo define o banco: "local" (PostgreSQL, padrao) ou "dev" (H2 em memoria).
+# Nenhum segredo deve ser escrito neste arquivo - use variaveis de ambiente
+# ou o arquivo .env (fora do repositorio).
 # ---------------------------------------------------------------------------
 spring:
   application:
     name: teamrec
+  # Le o .env da pasta do backend como properties, se existir. E o mesmo arquivo
+  # usado pelo docker compose; variaveis de ambiente reais continuam valendo.
+  config:
+    import: optional:file:.env[.properties]
   profiles:
-    default: dev
+    default: local
   jackson:
     default-property-inclusion: non_null
     deserialization:

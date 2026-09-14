@@ -1,0 +1,98 @@
+\subsubsection{Uso e Aplicação do Modelo de Aprendizagem}
+
+Concluída a etapa de treinamento, o modelo foi incorporado ao protótipo como um serviço de predição independente, desenvolvido em Python com o \textit{framework} FastAPI. Esse serviço carrega o modelo uma única vez, na sua inicialização, recebe do \textit{backend} um lote de candidatos e devolve o escore de afinidade de cada um. Antes de consultar o modelo, o serviço verifica se todos os valores recebidos estão dentro das faixas utilizadas no treinamento, recusando entradas fora desse domínio.
+
+O fluxo de uma recomendação é iniciado pelo gestor, que seleciona o projeto para o qual deseja formar a equipe. A partir dessa solicitação, o \textit{backend} recupera os requisitos do projeto e os desenvolvedores ativos, calcula as variáveis de entrada de cada candidato e envia o conjunto ao serviço de predição. De posse dos escores, o \textit{backend} ordena os candidatos, aplica as regras de composição da equipe, calcula as métricas de avaliação e registra o resultado. O resultado consolidado é então encaminhado ao modelo de linguagem, responsável por redigir a justificativa apresentada ao gestor.
+
+A Tabela~\ref{tab:vetor} apresenta como cada variável de entrada do modelo é obtida a partir dos dados cadastrados no sistema. As mesmas regras de cálculo utilizadas na geração da base de treinamento são reproduzidas no momento da recomendação, garantindo que o modelo receba os dados no mesmo formato em que foi treinado.
+
+\begin{table}[htbp]
+\centering
+\caption{Obtenção das variáveis de entrada do modelo a partir dos dados do sistema}
+\label{tab:vetor}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lll}
+\hline
+\textbf{Variável} & \textbf{Origem no sistema} & \textbf{Cálculo} \\
+\hline
+Senioridade & Cadastro do desenvolvedor & Júnior = 1, Pleno = 2, Sênior = 3 \\
+Papéis de atuação (6) & Papel principal do desenvolvedor & 1 no papel do desenvolvedor e 0 nos demais \\
+Competências comportamentais & Cadastro do desenvolvedor & Valor direto, de 0 a 5 \\
+Criticidade & Cadastro do projeto & Baixa = 1, Média = 2, Alta = 3 \\
+Requisito de \textit{backend} & Papéis exigidos pelo projeto & 1 se o projeto exige \textit{backend} ou \textit{full-stack} \\
+Requisito de \textit{frontend} & Papéis exigidos pelo projeto & 1 se o projeto exige \textit{frontend} ou \textit{full-stack} \\
+Aderência técnica & Tecnologias do desenvolvedor e do projeto & Pesos das tecnologias dominadas $\div$ pesos exigidos \\
+Cobertura de horas & Disponibilidade, alocações e projeto & Horas livres $\div$ horas exigidas, limitada a 1 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+A cobertura de horas merece destaque. As horas consideradas não correspondem à disponibilidade informada no cadastro, mas às horas que ainda estão livres, obtidas pela diferença entre a disponibilidade declarada e as horas já comprometidas em outros projetos ativos. Dessa forma, um profissional já alocado em outras frentes apresenta cobertura de horas menor e, consequentemente, um escore de afinidade menor para o novo projeto.
+
+Como o escore de afinidade avalia cada candidato de forma individual, a formação da equipe exige regras adicionais, aplicadas pelo \textit{backend} após o ranqueamento, em três etapas:
+
+\begin{enumerate}
+    \item \textbf{Elegibilidade:} somente participam da equipe os profissionais com horas livres suficientes para atender à carga semanal exigida pelo projeto. Um escore alto não compensa a falta de disponibilidade, pois não é possível alocar um profissional que não tem tempo para o projeto. Os candidatos inelegíveis permanecem no ranqueamento, identificados como tal.
+    \item \textbf{Vagas por papel:} cada vaga exigida pelo projeto é preenchida pelo candidato elegível de maior escore que possui exatamente aquele papel de atuação.
+    \item \textbf{Posições livres:} as posições restantes, até completar o tamanho da equipe, são preenchidas pelos candidatos elegíveis de maior escore, independentemente do papel.
+\end{enumerate}
+
+Quando não há candidatos elegíveis suficientes, o sistema propõe a melhor equipe possível com os profissionais disponíveis, em vez de não apresentar resultado, e registra as restrições encontradas, como a quantidade de integrantes faltantes, as vagas que não puderam ser preenchidas pelo papel exigido e as tecnologias obrigatórias que nenhum integrante domina.
+
+A recomendação representa apenas uma sugestão e, por isso, não reduz a disponibilidade dos profissionais. Essa redução ocorre somente quando o gestor confirma a equipe, momento em que os integrantes são alocados ao projeto. A partir da confirmação, as horas comprometidas passam a ser descontadas nas recomendações de outros projetos, o que impede que um mesmo profissional seja indicado para projetos simultâneos além da sua capacidade.
+
+Cada recomendação é registrada com o ranqueamento completo dos candidatos, os valores de aderência técnica e cobertura de horas utilizados no cálculo e as métricas da equipe proposta. Esse registro permite consultar o resultado posteriormente, mesmo que os perfis dos profissionais sejam alterados, além de identificar quais candidatos ficaram de fora da equipe e por qual motivo.
+
+
+\subsubsection{Cenários de Avaliação}
+
+A avaliação do protótipo foi conduzida por meio da simulação de cenários controlados, representativos de situações recorrentes na formação de equipes de desenvolvimento de software. Em cada cenário, a equipe proposta pelo protótipo foi avaliada por três métricas.
+
+A primeira é a cobertura de papéis, que indica o percentual das vagas exigidas pelo projeto que foram preenchidas por profissionais com o papel correspondente, conforme a Equação 2:
+
+\begin{equation}
+CP = \frac{\sum_{r} \min(n_r, v_r)}{\sum_{r} v_r} \times 100
+\end{equation}
+
+Na qual $v_r$ representa o número de vagas exigidas para o papel $r$ e $n_r$ o número de integrantes da equipe com esse papel. O uso do mínimo impede que integrantes excedentes em um papel compensem a falta de outro.
+
+A segunda é a cobertura de tecnologias, que indica o percentual dos pesos das tecnologias exigidas que é dominado por ao menos um integrante da equipe, conforme a Equação 3:
+
+\begin{equation}
+CT = \frac{\sum_{t \in D} p_t}{\sum_{t \in E} p_t} \times 100
+\end{equation}
+
+Na qual $E$ representa o conjunto de tecnologias exigidas pelo projeto, $D$ o subconjunto dessas tecnologias dominado por ao menos um integrante e $p_t$ o peso da tecnologia $t$.
+
+A terceira é a dispersão da equipe, medida pelo desvio padrão da senioridade dos integrantes, conforme a Equação 4:
+
+\begin{equation}
+\sigma_s = \sqrt{\frac{1}{n} \sum_{i=1}^{n} \left(s_i - \bar{s}\right)^2}
+\end{equation}
+
+Na qual $n$ representa o número de integrantes, $s_i$ o nível de senioridade do integrante $i$ e $\bar{s}$ a senioridade média da equipe. Nas duas primeiras métricas, valores mais elevados indicam melhor desempenho; na terceira, valores menores indicam equipes mais niveladas. De forma complementar, também foi registrado o escore de afinidade médio da equipe.
+
+Para verificar se as equipes recomendadas são superiores a escolhas não orientadas por dados, adotou-se como linha de base a composição aleatória de equipes. Em cada cenário, foram sorteadas 100 equipes com o mesmo tamanho definido para o projeto, escolhidas apenas entre os profissionais elegíveis, isto é, entre os mesmos candidatos com horas livres a partir dos quais o protótipo forma a sua equipe. Cada equipe sorteada foi avaliada pelas mesmas métricas, e a média dos 100 sorteios constitui o valor de referência, acompanhada do desvio padrão, que indica o quanto o resultado varia de um sorteio para outro. O sorteio utilizou uma semente fixa, o que permite reproduzir exatamente os mesmos resultados.
+
+Restringir o sorteio aos profissionais elegíveis torna a comparação mais rigorosa: como o protótipo e a linha de base partem do mesmo grupo de candidatos, a diferença entre os resultados reflete apenas o critério de escolha. Por outro lado, como não existem registros históricos de alocações reais, essa linha de base demonstra que o desempenho do protótipo não decorre do acaso, mas não permite compará-lo diretamente ao desempenho de gestores humanos.
+
+% Modelo de tabela para cada cenario. Os valores saem de
+% GET /api/recomendacoes/{id}/linha-base?sorteios=100&semente=42
+%   Prototipo           -> prototipo.*
+%   Linha de base       -> linhaBase.media.* e linhaBase.desvioPadrao.*
+\begin{table}[htbp]
+\centering
+\caption{Resultados do Cenário 1}
+\label{tab:cenario1}
+\begin{tabular}{lcc}
+\hline
+\textbf{Métrica} & \textbf{Protótipo} & \textbf{Linha de base} \\
+\hline
+Cobertura de papéis (\%) & [PREENCHER] & [PREENCHER] $\pm$ [PREENCHER] \\
+Cobertura de tecnologias (\%) & [PREENCHER] & [PREENCHER] $\pm$ [PREENCHER] \\
+Desvio padrão da senioridade & [PREENCHER] & [PREENCHER] $\pm$ [PREENCHER] \\
+Escore médio da equipe & [PREENCHER] & [PREENCHER] $\pm$ [PREENCHER] \\
+\hline
+\end{tabular}
+\end{table}

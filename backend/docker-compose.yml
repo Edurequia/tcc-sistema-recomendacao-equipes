@@ -1,0 +1,35 @@
+# ---------------------------------------------------------------------------
+# PostgreSQL do perfil "local".
+#
+# Subir:    docker compose up -d
+# Parar:    docker compose down        (os dados ficam no volume)
+# Zerar:    docker compose down -v     (apaga o volume e todos os dados)
+#
+# As credenciais vem do arquivo .env (copie de .env.example), o mesmo que o
+# Spring le na inicializacao - assim banco e aplicacao nunca divergem.
+#
+# A porta exposta no host e 5433 por padrao, para nao colidir com um
+# PostgreSQL instalado nativamente na 5432.
+# ---------------------------------------------------------------------------
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: teamrec-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-teamrec}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no arquivo .env}
+      TZ: America/Sao_Paulo
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - teamrec-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  teamrec-pgdata:

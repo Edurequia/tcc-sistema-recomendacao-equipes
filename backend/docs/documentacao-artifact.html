@@ -543,7 +543,7 @@ footer {
         <li><a href="#vetor">O vetor de 39 atributos</a></li>
         <li><a href="#fases">Roadmap por fases</a></li>
         <li><a href="#decisoes">Decisões e trade-offs</a></li>
-        <li><a href="#rodar">Como rodar</a></li>
+        <li><a href="#rodar">Como rodar e testar</a></li>
         <li><a href="#pendencias">Pendências e riscos</a></li>
       </ol>
     </nav>
@@ -1509,19 +1509,20 @@ footer {
 
       <!-- ============================================================ -->
       <section id="rodar">
-        <h2>Como rodar</h2>
+        <h2>Como rodar e testar</h2>
         <p class="sec-note">Não é preciso instalar Maven — o projeto traz o <em>wrapper</em>.</p>
 
-        <h4>Perfil dev — H2 em memória, zero instalação</h4>
-        <pre><code>cd backend
-./mvnw spring-boot:run</code></pre>
+        <h4>Subir a aplicação</h4>
+        <p>Pelo IntelliJ, basta executar a classe <code>TeamrecApplication</code>: o perfil
+          <code>dev</code> é o padrão e não exige nenhuma configuração. Pelo terminal:</p>
+        <pre><code><span class="c"># perfil dev — H2 em memória, zero instalação</span>
+cd backend
+./mvnw spring-boot:run
 
-        <h4>Perfil local — PostgreSQL</h4>
-        <pre><code><span class="k">export</span> DB_PASSWORD=sua-senha
+<span class="c"># perfil local — PostgreSQL</span>
+<span class="k">export</span> DB_PASSWORD=sua-senha
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local</code></pre>
-
-        <h4>Testes</h4>
-        <pre><code>./mvnw test   <span class="c"># 53 testes: contexto, persistência, catálogo e API</span></code></pre>
+        <p>Está no ar quando o log mostrar <code>Started TeamrecApplication</code>.</p>
 
         <div class="tw">
           <table>
@@ -1535,10 +1536,94 @@ footer {
           </table>
         </div>
 
+        <h3>Inspecionar o banco no perfil dev</h3>
+        <p>O console do H2 abre em <code>localhost:8080/h2-console</code>. O campo
+          <strong>JDBC URL</strong> vem preenchido com um valor genérico e
+          <strong>precisa ser substituído</strong> — é o erro mais comum ao conectar:</p>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
+            <tbody>
+              <tr><td>Driver Class</td><td class="mono">org.h2.Driver</td></tr>
+              <tr><td><strong>JDBC URL</strong></td><td class="mono">jdbc:h2:mem:teamrec;DB_CLOSE_DELAY=-1;MODE=PostgreSQL</td></tr>
+              <tr><td>User Name</td><td class="mono">sa</td></tr>
+              <tr><td>Password</td><td><em>vazio</em></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note warn">
+          <p><strong>O banco vive em memória.</strong> Tudo é descartado quando a aplicação para,
+            e o catálogo de 38 competências é recriado a cada inicialização. É intencional no
+            perfil <code>dev</code>: cada execução parte de um estado limpo e reprodutível.</p>
+        </div>
+
+        <p>Consultas para começar:</p>
+        <pre><code><span class="c">-- As 30 tecnologias e a coluna correspondente na matriz de treinamento</span>
+<span class="k">SELECT</span> NOME, CHAVE_DATASET, CATEGORIA <span class="k">FROM</span> HABILIDADE
+<span class="k">WHERE</span> CHAVE_DATASET <span class="k">IS NOT NULL</span> <span class="k">ORDER BY</span> NOME;
+
+<span class="c">-- Desenvolvedores com suas competências e proficiências</span>
+<span class="k">SELECT</span> d.NOME, d.SENIORIDADE, d.PAPEL_PRINCIPAL,
+       h.NOME <span class="k">AS</span> COMPETENCIA, dh.PROFICIENCIA
+<span class="k">FROM</span> DESENVOLVEDOR d
+<span class="k">JOIN</span> DESENVOLVEDOR_HABILIDADE dh <span class="k">ON</span> dh.DESENVOLVEDOR_ID = d.ID
+<span class="k">JOIN</span> HABILIDADE h <span class="k">ON</span> h.ID = dh.HABILIDADE_ID
+<span class="k">ORDER BY</span> d.NOME;
+
+<span class="c">-- Papéis exigidos por projeto</span>
+<span class="k">SELECT</span> p.NOME, pp.PAPEL, pp.QUANTIDADE
+<span class="k">FROM</span> PROJETO p
+<span class="k">JOIN</span> PROJETO_PAPEL_REQUERIDO pp <span class="k">ON</span> pp.PROJETO_ID = p.ID;</code></pre>
+
+        <h3>Exercitar a API</h3>
+        <p>Há dois caminhos, com propósitos diferentes.</p>
+
+        <p><strong>Swagger UI</strong>, em <code>localhost:8080/swagger-ui.html</code>, lista os
+          19 endpoints com seus campos e um botão para executar direto do navegador. É o melhor
+          recurso para explorar o contrato.</p>
+
+        <p><strong>O arquivo <code>backend/api.http</code></strong> traz um roteiro de 37
+          requisições encadeadas, executáveis uma a uma pelo cliente HTTP do IntelliJ. Ele captura
+          os identificadores automaticamente — os das competências, o do desenvolvedor criado, o
+          do projeto —, de modo que nenhum valor precisa ser copiado manualmente entre
+          requisições.</p>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Requisições</th><th>O que demonstram</th></tr></thead>
+            <tbody>
+              <tr><td class="num">1–7</td><td>Catálogo carregado, com a chave de cada tecnologia no modelo</td></tr>
+              <tr><td class="num">8–16</td><td>Três perfis distintos, paginação, filtros combinados e ajuste de disponibilidade</td></tr>
+              <tr><td class="num">17–20</td><td>Os erros: 409 duplicado, 400 fora de escala, 404 inexistente, 422 repetido</td></tr>
+              <tr><td class="num">21–28</td><td>Projeto com papéis e stack, e as três validações que devolvem 422</td></tr>
+              <tr><td class="num">29–34</td><td>Exclusão lógica: nada desaparece da base</td></tr>
+              <tr><td class="num">35–37</td><td>O formato de erro é o mesmo em qualquer rota</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Duas requisições merecem atenção enquanto rodam. A de número 8 envia o e-mail como
+          <code>"  ANA.SOUZA@UFN.EDU.BR "</code>, de propósito, e a resposta volta normalizada —
+          há uma asserção automática verificando isso. A de número 16 ajusta apenas a
+          disponibilidade e preserva as competências, demonstrando por que essa operação é
+          separada do <code>PUT</code>.</p>
+
+        <h4>Testes automatizados</h4>
+        <pre><code>./mvnw test   <span class="c"># 53 testes: contexto, persistência, catálogo e API</span></code></pre>
+
         <h4>Configuração</h4>
         <p>Copie <code>.env.example</code> para <code>.env</code> e preencha. Nenhum segredo é
           versionado: <code>DB_PASSWORD</code>, <code>GEMINI_API_KEY</code>,
           <code>PREDICTION_BASE_URL</code> e <code>APP_CORS_ORIGINS</code> vêm todos do ambiente.</p>
+
+        <h4>Quando a porta 8080 aparecer ocupada</h4>
+        <p>Normalmente é um processo Java órfão de uma execução anterior — o
+          <code>spring-boot:run</code> executa a aplicação em um processo separado, que sobrevive
+          ao encerramento do Maven. Para identificar e encerrar:</p>
+        <pre><code>Get-Process -Id (Get-NetTCPConnection -LocalPort 8080 -State Listen).OwningProcess
+Stop-Process -Id &lt;PID&gt; -Force</code></pre>
       </section>
 
       <!-- ============================================================ -->

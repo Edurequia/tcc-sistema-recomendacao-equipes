@@ -24,6 +24,7 @@ public interface RecomendacaoRepository extends JpaRepository<Recomendacao, Long
             left join fetch m.desenvolvedor
             join fetch r.projeto
             where r.id = :id
+            order by m.posicaoRanking
             """)
     Optional<Recomendacao> buscarCompleta(@Param("id") Long id);
 

@@ -1,11 +1,11 @@
 # ---------------------------------------------------------------------------
-# Perfil "local": PostgreSQL, o SGBD definido no TFG.
-# Ativar com:  --spring.profiles.active=local
-# A senha vem de variavel de ambiente (DB_PASSWORD), nunca do arquivo.
+# Perfil "local": PostgreSQL, o SGBD definido no TFG. E o perfil padrao.
+# Banco pronto com:  docker compose up -d   (porta 5433 no host)
+# A senha vem do .env ou de variavel de ambiente (DB_PASSWORD), nunca do arquivo.
 # ---------------------------------------------------------------------------
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/teamrec}
+    url: ${DB_URL:jdbc:postgresql://localhost:${DB_PORT:5433}/${DB_NAME:teamrec}}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver

@@ -11,6 +11,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -79,6 +80,19 @@ public class GlobalExceptionHandler {
                 .map(v -> new ApiError.CampoInvalido(v.getPropertyPath().toString(), v.getMessage()))
                 .toList();
 
+        return ResponseEntity.badRequest().body(ApiError.deValidacao(
+                400, "Um ou mais parametros estao invalidos.", req.getRequestURI(), campos));
+    }
+
+    /** Parametro de query/path reprovado pela validacao nativa do Spring MVC (@Min, @Max...) -> 400. */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ApiError> tratarParametroInvalidoNoMetodo(HandlerMethodValidationException ex,
+                                                                    HttpServletRequest req) {
+        List<ApiError.CampoInvalido> campos = ex.getParameterValidationResults().stream()
+                .flatMap(resultado -> resultado.getResolvableErrors().stream()
+                        .map(erro -> new ApiError.CampoInvalido(
+                                resultado.getMethodParameter().getParameterName(), erro.getDefaultMessage())))
+                .toList();
         return ResponseEntity.badRequest().body(ApiError.deValidacao(
                 400, "Um ou mais parametros estao invalidos.", req.getRequestURI(), campos));
     }
