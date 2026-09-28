@@ -1,14 +1,20 @@
 package br.ufn.tfg.teamrec.controller;
 
+import br.ufn.tfg.teamrec.dto.request.ConsultaRequest;
+import br.ufn.tfg.teamrec.dto.request.ConversaRequest;
 import br.ufn.tfg.teamrec.dto.response.AlocacaoResponse;
+import br.ufn.tfg.teamrec.dto.response.ConversaResponse;
+import br.ufn.tfg.teamrec.dto.response.JustificativaResponse;
 import br.ufn.tfg.teamrec.dto.response.LinhaBaseResponse;
 import br.ufn.tfg.teamrec.dto.response.RecomendacaoResponse;
 import br.ufn.tfg.teamrec.dto.response.RecomendacaoResumoResponse;
 import br.ufn.tfg.teamrec.service.AlocacaoService;
+import br.ufn.tfg.teamrec.service.ConversaService;
 import br.ufn.tfg.teamrec.service.RecomendacaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +44,7 @@ public class RecomendacaoController {
 
     private final RecomendacaoService service;
     private final AlocacaoService alocacaoService;
+    private final ConversaService conversaService;
 
     @PostMapping("/projetos/{projetoId}/recomendacoes")
     @Operation(summary = "Gera uma recomendacao para o projeto",
@@ -48,6 +56,31 @@ public class RecomendacaoController {
         return ResponseEntity
                 .created(uriBuilder.path("/api/recomendacoes/{id}").build(gerada.id()))
                 .body(gerada);
+    }
+
+    @PostMapping("/recomendacoes/conversa")
+    @Operation(summary = "Gera uma recomendacao a partir de um pedido em linguagem natural",
+            description = "O modelo de linguagem extrai os requisitos do texto, o projeto e criado "
+                    + "com as mesmas validacoes do cadastro por formulario e a recomendacao segue "
+                    + "a mesma pipeline, gravada com origem CHAT e a consulta original. Responde "
+                    + "422 quando o texto nao informa o minimo necessario e 503 quando a "
+                    + "integracao nao esta configurada ou o modelo esta indisponivel.")
+    public ResponseEntity<RecomendacaoResponse> gerarPorConversa(@RequestBody @Valid ConsultaRequest request,
+                                                                 UriComponentsBuilder uriBuilder) {
+        RecomendacaoResponse gerada = service.gerarPorConversa(request.consulta());
+        return ResponseEntity
+                .created(uriBuilder.path("/api/recomendacoes/{id}").build(gerada.id()))
+                .body(gerada);
+    }
+
+    @PostMapping("/recomendacoes/conversa/turnos")
+    @Operation(summary = "Conduz a conversa ate o pedido virar uma recomendacao",
+            description = "Recebe o historico completo da conversa e devolve, com HTTP 200, ou uma "
+                    + "pergunta (status PERGUNTA) nomeando o que ainda falta, ou a recomendacao "
+                    + "gerada (status RECOMENDACAO). O historico e mantido pelo cliente: o backend "
+                    + "nao guarda estado de sessao.")
+    public ConversaResponse conversar(@RequestBody @Valid ConversaRequest request) {
+        return conversaService.responder(request);
     }
 
     @GetMapping("/projetos/{projetoId}/recomendacoes")
@@ -74,6 +107,19 @@ public class RecomendacaoController {
             @Parameter(description = "Semente do gerador aleatorio; a mesma semente repete o resultado.")
             @RequestParam(defaultValue = "42") long semente) {
         return service.linhaBase(id, sorteios, semente);
+    }
+
+    @PostMapping("/recomendacoes/{id}/justificativa")
+    @Operation(summary = "Pede ao modelo de linguagem a explicacao da equipe recomendada",
+            description = "Envia ao modelo o ranking, as metricas e as restricoes ja gravados e "
+                    + "guarda o texto na recomendacao. O texto ja existente e reaproveitado; use "
+                    + "regerar=true para produzir um novo. Responde 503 quando a integracao nao "
+                    + "esta configurada ou o modelo esta indisponivel.")
+    public JustificativaResponse justificar(
+            @PathVariable Long id,
+            @Parameter(description = "Ignora a justificativa ja gravada e consulta o modelo de novo.")
+            @RequestParam(defaultValue = "false") boolean regerar) {
+        return service.justificar(id, regerar);
     }
 
     @PostMapping("/recomendacoes/{id}/confirmacao")

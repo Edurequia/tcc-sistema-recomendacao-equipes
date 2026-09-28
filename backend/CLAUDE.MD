@@ -36,6 +36,10 @@ Ferramental recomendado: `superpowers@claude-plugins-official`, `supply-chain-ri
 | `domain-modeling` | Fixar terminologia do domínio e registrar decisões arquiteturais |
 | `obsidian-vault` / `obsidian-markdown` | Gerenciar as notas do vault |
 | `run` | Subir e ver o app funcionando de verdade, não só passar teste |
+| `frontend-design` | Direção visual, estruturação de layout, hierarquia de informação e prototipagem de novos componentes no React. |
+| `ui-ux-pro-max` | Polimento fino de usabilidade, microinterações, espaçamento, tipografia e validação do Design System (como o Material UI, por exemplo). |
+| `accessibility-audit` | Revisão de contraste de cores, navegação por teclado e atributos ARIA, garantindo que a interface não quebre regras de acessibilidade. |
+| `responsive-design-checker` | Validação e ajuste do comportamento da interface em diferentes pontos de quebra (telas de celular, tablet e desktop). |
 
 ---
 
@@ -57,16 +61,23 @@ Ferramental recomendado: `superpowers@claude-plugins-official`, `supply-chain-ri
 ```bash
 # Perfil LOCAL (padrao, PostgreSQL persistente). Credenciais no backend/.env
 cd backend
-docker compose up -d          # PostgreSQL em localhost:5433
+docker compose up -d           # PostgreSQL em localhost:5433
 ./mvnw spring-boot:run
 
 # Perfil DEV (H2 em memória, limpo a cada inicialização)
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 
-# Rodar os testes automatizados do backend (atualmente 107 testes verdes, sempre em perfil dev)
+# Rodar os testes automatizados do backend (atualmente 129 testes verdes, sempre em perfil dev)
 ./mvnw test
 
 # Motor de predicao (Python 3.10) - necessario para gerar recomendacoes
 cd ../api_motor_predicao
 .venv/Scripts/python.exe -m uvicorn app.main:app --port 8000
 .venv/Scripts/python.exe -m pytest   # 20 testes, usam o modelo real
+
+# Frontend (React + Vite) - depende do backend em localhost:8080 (proxy /api)
+cd ../frontend
+npm install
+npm run dev          # http://localhost:5173
+npm test             # 76 testes (Vitest + MSW, sem backend real)
+```

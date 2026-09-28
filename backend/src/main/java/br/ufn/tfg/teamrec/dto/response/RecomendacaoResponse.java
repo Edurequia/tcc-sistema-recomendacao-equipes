@@ -30,6 +30,7 @@ public record RecomendacaoResponse(
         int integrantesSelecionados,
         MetricasEquipeResponse metricas,
         String observacaoRestricao,
+        String justificativaLlm,
         List<MembroRankingResponse> ranking
 ) {
 }

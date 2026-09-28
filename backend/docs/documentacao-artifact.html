@@ -458,7 +458,7 @@ figcaption { font-size: 12.5px; color: var(--ink-3); margin-top: 8px; max-width:
 .phase-b li { margin-bottom: 4px; }
 
 /* ==========================================================================
-   Vector strip — the 39 model features
+   Vector strip — the 13 model features
    ========================================================================== */
 .vector {
   display: flex;
@@ -477,6 +477,7 @@ figcaption { font-size: 12.5px; color: var(--ink-3); margin-top: 8px; max-width:
   white-space: nowrap;
 }
 .vslot.hi { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
+.vslot.proj { border-style: dashed; border-color: var(--ink-3); color: var(--ink); }
 
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--ink-3); margin: 0 0 20px; }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
@@ -503,7 +504,8 @@ footer {
     <dl class="factbar">
       <div class="fact"><dt>Módulo</dt><dd>Backend orquestrador</dd></div>
       <div class="fact"><dt>Runtime</dt><dd>Java 21 · Spring Boot 3.5.16</dd></div>
-      <div class="fact"><dt>Persistência</dt><dd>PostgreSQL</dd></div>
+      <div class="fact"><dt>Persistência</dt><dd>PostgreSQL 17</dd></div>
+      <div class="fact"><dt>Motor</dt><dd>LightGBM · FastAPI</dd></div>
       <div class="fact"><dt>Pacote</dt><dd class="mono">br.ufn.tfg.teamrec</dd></div>
       <div class="fact"><dt>Autor</dt><dd>Eduardo Requia Souza</dd></div>
       <div class="fact"><dt>Orientador</dt><dd>Alexandre Zamberlan</dd></div>
@@ -511,18 +513,18 @@ footer {
 
     <div class="meter">
       <div class="meter-head">
-        <span><strong>4 de 8 fases concluídas.</strong> Fase 4 aguardando início.</span>
-        <span class="mono">53 testes verdes</span>
+        <span><strong>7 de 8 fases concluídas.</strong> Fase 7 em andamento; frontend React implementado.</span>
+        <span class="mono">129 testes no backend · 20 no motor · 76 no frontend</span>
       </div>
       <div class="meter-track">
         <div class="meter-cell" data-state="done" title="Fase 0 — concluída"></div>
         <div class="meter-cell" data-state="done" title="Fase 1 — concluída"></div>
         <div class="meter-cell" data-state="done" title="Fase 2 — concluída"></div>
         <div class="meter-cell" data-state="done" title="Fase 3 — concluída"></div>
-        <div class="meter-cell" data-state="now"  title="Fase 4 — próxima"></div>
-        <div class="meter-cell" title="Fase 5"></div>
-        <div class="meter-cell" title="Fase 6"></div>
-        <div class="meter-cell" title="Fase 7"></div>
+        <div class="meter-cell" data-state="done" title="Fase 4 — concluída"></div>
+        <div class="meter-cell" data-state="done" title="Fase 5 — concluída"></div>
+        <div class="meter-cell" data-state="done" title="Fase 6 — concluída"></div>
+        <div class="meter-cell" data-state="now"  title="Fase 7 — em andamento"></div>
       </div>
     </div>
   </header>
@@ -540,7 +542,8 @@ footer {
         <li><a href="#endpoints">Endpoints disponíveis</a></li>
         <li><a href="#dominio">Modelo de domínio</a></li>
         <li><a href="#enums">Enums e o dataset</a></li>
-        <li><a href="#vetor">O vetor de 39 atributos</a></li>
+        <li><a href="#motor">Motor de predição</a></li>
+        <li><a href="#composicao">Composição e métricas</a></li>
         <li><a href="#fases">Roadmap por fases</a></li>
         <li><a href="#decisoes">Decisões e trade-offs</a></li>
         <li><a href="#rodar">Como rodar e testar</a></li>
@@ -590,7 +593,7 @@ footer {
           no mesmo processo, cada um roda onde é forte e conversam por HTTP.</p>
 
         <figure class="figure">
-          <svg viewBox="0 0 880 340" role="img" aria-label="Diagrama da arquitetura: o frontend React fala com o backend Spring Boot, que consulta o serviço FastAPI com PyCaret, a API do Gemini e o banco PostgreSQL.">
+          <svg viewBox="0 0 880 340" role="img" aria-label="Diagrama da arquitetura: o frontend React fala com o backend Spring Boot, que consulta o serviço FastAPI com o modelo LightGBM, a API do Gemini e o banco PostgreSQL.">
             <!-- React -->
             <rect class="svg-box" x="14" y="126" width="150" height="74" rx="4"></rect>
             <text class="svg-t" x="89" y="156" text-anchor="middle">React</text>
@@ -605,8 +608,8 @@ footer {
 
             <!-- FastAPI -->
             <rect class="svg-box" x="580" y="34" width="196" height="74" rx="4"></rect>
-            <text class="svg-t" x="678" y="64" text-anchor="middle">FastAPI + PyCaret</text>
-            <text class="svg-s" x="678" y="84" text-anchor="middle">motor de predição</text>
+            <text class="svg-t" x="678" y="64" text-anchor="middle">FastAPI + LightGBM</text>
+            <text class="svg-s" x="678" y="84" text-anchor="middle">motor de predição · Python</text>
 
             <!-- Gemini -->
             <rect class="svg-box" x="580" y="218" width="196" height="74" rx="4"></rect>
@@ -625,7 +628,7 @@ footer {
 
             <!-- Backend -> FastAPI -->
             <path class="svg-line" d="M460 140 C 520 140, 520 71, 572 71" marker-end="url(#a)"></path>
-            <text class="svg-e" x="516" y="96" text-anchor="middle">atributos</text>
+            <text class="svg-e" x="516" y="96" text-anchor="middle">13 variáveis</text>
             <text class="svg-e" x="516" y="110" text-anchor="middle">→ escore</text>
 
             <!-- Backend -> Gemini -->
@@ -661,12 +664,12 @@ footer {
               </tr>
               <tr>
                 <td><strong>Spring Boot</strong></td>
-                <td>Domínio, persistência, montagem do vetor de atributos, regras de composição, orquestração</td>
+                <td>Domínio, persistência, cálculo das variáveis de entrada, composição da equipe, métricas, alocações</td>
                 <td>Não calcula escore nem gera texto</td>
               </tr>
               <tr>
-                <td><strong>FastAPI + PyCaret</strong></td>
-                <td>Recebe atributos, devolve o escore de afinidade do modelo LightGBM</td>
+                <td><strong>FastAPI + LightGBM</strong></td>
+                <td>Recebe as 13 variáveis de cada candidato, recusa valores fora do domínio de treino e devolve o escore do modelo treinado no PyCaret</td>
                 <td>Não conhece o banco nem o conceito de equipe</td>
               </tr>
               <tr>
@@ -704,12 +707,26 @@ footer {
               <tr><td>Java</td><td class="num mono">21 LTS</td><td>Versão de suporte estendido; habilita <code>record</code> para DTOs imutáveis</td></tr>
               <tr><td>Spring Boot</td><td class="num mono">3.5.16</td><td>Última da linha 3.x. Escolhida sobre a 4.x por compatibilidade com o Spring AI 1.1.x</td></tr>
               <tr><td>Spring Data JPA</td><td class="num mono">—</td><td>Repositórios declarativos; menos SQL manual, mais consulta verificada na inicialização</td></tr>
-              <tr><td>PostgreSQL</td><td class="num mono">driver 42.x</td><td>SGBD definido na metodologia do trabalho</td></tr>
-              <tr><td>H2</td><td class="num mono">—</td><td>Perfil <code>dev</code>: sobe em memória, sem instalar nada</td></tr>
+              <tr><td>PostgreSQL</td><td class="num mono">17</td><td>SGBD definido na metodologia. Perfil <code>local</code>, o padrão; sobe com <code>docker compose</code></td></tr>
+              <tr><td>H2</td><td class="num mono">—</td><td>Perfil <code>dev</code> e testes automatizados: sobe em memória, sem instalar nada</td></tr>
               <tr><td>springdoc-openapi</td><td class="num mono">2.8.13</td><td>Swagger UI como contrato vivo entre backend e React</td></tr>
               <tr><td>MapStruct</td><td class="num mono">1.6.3</td><td>Mapeia entidade ⇄ DTO gerando código em compilação; sem reflexão em produção</td></tr>
               <tr><td>Lombok</td><td class="num mono">1.18.36</td><td>Remove <em>getters</em> e construtores repetitivos das entidades</td></tr>
-              <tr><td>Spring AI</td><td class="num mono">1.1.8</td><td>Entra na Fase 6, com o starter <code>google-genai</code></td></tr>
+              <tr><td>Spring AI</td><td class="num mono">1.1.8</td><td>Starter <code>google-genai</code>; justificativa e extração de parâmetros (Fase 6)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Motor de predição</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Item</th><th>Versão</th><th>Por que esta</th></tr></thead>
+            <tbody>
+              <tr><td>Python</td><td class="num mono">3.10</td><td>Ambiente em que o modelo foi treinado</td></tr>
+              <tr><td>PyCaret</td><td class="num mono">3.3.2</td><td>O <code>.pkl</code> é um pipeline PyCaret; só abre com a mesma versão</td></tr>
+              <tr><td>scikit-learn</td><td class="num mono">1.4.2</td><td>Fixada pelo PyCaret 3.3.2 e registrada dentro do próprio <code>.pkl</code></td></tr>
+              <tr><td>LightGBM</td><td class="num mono">4.6.0</td><td><strong>Não atualizar:</strong> a 4.7.0, instalada por padrão, derruba o processo ao prever</td></tr>
+              <tr><td>FastAPI</td><td class="num mono">0.115.14</td><td>Contrato validado por Pydantic 2.11, com Swagger próprio em <code>/docs</code></td></tr>
             </tbody>
           </table>
         </div>
@@ -739,6 +756,7 @@ footer {
 ├── <span class="k">config/</span>            <span class="c">CORS, OpenAPI, auditoria JPA, clientes HTTP</span>
 ├── <span class="k">controller/</span>        <span class="c">REST — recebe, valida, delega. Nada além disso</span>
 ├── <span class="k">service/</span>           <span class="c">regras de negócio; único lugar com @Transactional</span>
+│   └── composicao/    <span class="c">equipe, métricas e linha de base — lógica pura, sem JPA</span>
 ├── <span class="k">domain/</span>
 │   ├── entity/        <span class="c">9 entidades JPA + EntidadeBase</span>
 │   ├── enums/         <span class="c">7 enums do domínio</span>
@@ -748,9 +766,15 @@ footer {
 │   └── response/      <span class="c">records de saída</span>
 ├── <span class="k">mapper/</span>            <span class="c">MapStruct: entidade ⇄ DTO</span>
 ├── <span class="k">integration/</span>
-│   ├── prediction/    <span class="c">cliente do motor de predição (Fase 4)</span>
+│   ├── prediction/    <span class="c">cliente HTTP do motor e o contrato em records</span>
 │   └── llm/           <span class="c">integração com o Gemini (Fase 6)</span>
-└── <span class="k">shared/exception/</span>  <span class="c">ApiError + GlobalExceptionHandler</span></code></pre>
+└── <span class="k">shared/exception/</span>  <span class="c">ApiError + GlobalExceptionHandler</span>
+
+api_motor_predicao/     <span class="c">serviço Python, separado do backend</span>
+├── <span class="k">app/</span>main.py         <span class="c">FastAPI: carrega o modelo uma vez e expõe as rotas</span>
+├── <span class="k">app/</span>motor.py        <span class="c">colunas do contrato e montagem do DataFrame</span>
+├── <span class="k">app/</span>schemas.py      <span class="c">limites de cada campo (domínio do treino)</span>
+└── motor_predicao_tcc.pkl  <span class="c">não versionado</span></code></pre>
 
         <h3>O caminho de uma requisição</h3>
         <ol>
@@ -816,12 +840,12 @@ footer {
           <table>
             <thead><tr><th>Código</th><th>Quando</th><th>Exceção</th></tr></thead>
             <tbody>
-              <tr><td class="num">400</td><td>Campo inválido, JSON malformado, parâmetro de tipo errado</td><td class="mono">MethodArgumentNotValid…</td></tr>
+              <tr><td class="num">400</td><td>Campo inválido, JSON malformado, parâmetro de tipo errado ou fora da faixa</td><td class="mono">MethodArgumentNotValid… · HandlerMethodValidation…</td></tr>
               <tr><td class="num">404</td><td>Recurso ou rota inexistente</td><td class="mono">RecursoNaoEncontrado…</td></tr>
               <tr><td class="num">405</td><td>Verbo HTTP não suportado</td><td class="mono">HttpRequestMethodNot…</td></tr>
-              <tr><td class="num">409</td><td>Registro duplicado ou em uso</td><td class="mono">DataIntegrityViolation…</td></tr>
-              <tr><td class="num">422</td><td>Requisição válida que viola regra do domínio</td><td class="mono">RegraDeNegocio…</td></tr>
-              <tr><td class="num">503</td><td>Motor de predição ou Gemini fora do ar</td><td class="mono">ServicoExterno…</td></tr>
+              <tr><td class="num">409</td><td>Registro duplicado: e-mail, nome, pessoa já alocada no projeto</td><td class="mono">Conflito… · DataIntegrityViolation…</td></tr>
+              <tr><td class="num">422</td><td>Requisição válida que viola regra do domínio, como alocar além das horas livres</td><td class="mono">RegraDeNegocio…</td></tr>
+              <tr><td class="num">503</td><td>Motor de predição fora do ar, lento ou recusando o lote</td><td class="mono">ServicoExterno…</td></tr>
               <tr><td class="num">500</td><td>Qualquer falha não prevista, sem detalhes internos</td><td class="mono">Exception</td></tr>
             </tbody>
           </table>
@@ -837,7 +861,7 @@ footer {
       <!-- ============================================================ -->
       <section id="endpoints">
         <h2>Endpoints disponíveis</h2>
-        <p class="sec-note">O que já responde hoje. Tudo navegável no Swagger UI.</p>
+        <p class="sec-note">28 rotas respondendo hoje. Tudo navegável no Swagger UI.</p>
 
         <h4>Catálogo de habilidades</h4>
         <div class="tw">
@@ -906,7 +930,7 @@ footer {
               </tr>
               <tr>
                 <td class="mono">PATCH /api/desenvolvedores/{id}/disponibilidade</td>
-                <td>Ajusta só as horas semanais</td>
+                <td>Ajusta só as horas semanais. Recusa valor abaixo das horas já alocadas</td>
                 <td class="num">200 · 400 · 404 · 422</td>
               </tr>
               <tr>
@@ -963,9 +987,72 @@ footer {
           </table>
         </div>
 
+        <h4>Recomendações</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Rota</th><th>O quê</th><th>Respostas</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">POST /api/projetos/{id}/recomendacoes</td>
+                <td>Pontua os desenvolvedores ativos no motor, compõe a equipe, calcula as métricas e grava tudo</td>
+                <td class="num">201 · 404 · 422 · 503</td>
+              </tr>
+              <tr>
+                <td class="mono">GET /api/projetos/{id}/recomendacoes</td>
+                <td>Histórico do projeto com as métricas de cada execução, mais recente primeiro</td>
+                <td class="num">200 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">GET /api/recomendacoes/{id}</td>
+                <td>Equipe proposta, métricas, restrições e o ranking completo</td>
+                <td class="num">200 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">GET /api/recomendacoes/{id}/linha-base</td>
+                <td>Compara a equipe com equipes sorteadas entre os elegíveis. Parâmetros <code>sorteios</code> e <code>semente</code></td>
+                <td class="num">200 · 400 · 404 · 422</td>
+              </tr>
+              <tr>
+                <td class="mono">POST /api/recomendacoes/{id}/confirmacao</td>
+                <td>Aloca de uma vez os selecionados no projeto. Tudo ou nada</td>
+                <td class="num">200 · 404 · 409 · 422</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Alocações</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Rota</th><th>O quê</th><th>Respostas</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">POST /api/projetos/{id}/alocacoes</td>
+                <td>Aloca um desenvolvedor. Só <code>desenvolvedorId</code> é obrigatório</td>
+                <td class="num">201 · 400 · 404 · 409 · 422</td>
+              </tr>
+              <tr>
+                <td class="mono">GET /api/projetos/{id}/alocacoes</td>
+                <td>Equipe alocada no projeto (alocações ativas)</td>
+                <td class="num">200 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">GET /api/alocacoes/{id}</td>
+                <td>Uma alocação, ativa ou encerrada</td>
+                <td class="num">200 · 404</td>
+              </tr>
+              <tr>
+                <td class="mono">DELETE /api/alocacoes/{id}</td>
+                <td>Encerra logicamente e libera as horas</td>
+                <td class="num">204 · 404</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <h4>As regras que o cadastro de projeto impõe</h4>
         <p>Todas existem para impedir que uma especificação incoerente contamine as métricas
-          calculadas na Fase 5.</p>
+          calculadas na composição da equipe.</p>
         <div class="tw">
           <table>
             <thead><tr><th>Regra</th><th>Resposta</th><th>Por quê</th></tr></thead>
@@ -1000,7 +1087,7 @@ footer {
         </div>
         <p>O campo <code>vagasSemPapelFixo</code> devolvido pela API é a diferença entre o
           tamanho da equipe e as vagas distribuídas. Maior que zero significa que parte do time
-          fica em aberto — informação que a Fase 5 usará ao montar a composição.</p>
+          fica em aberto: essas posições são preenchidas pelos maiores escores, de qualquer papel.</p>
 
         <h4>Três decisões que aparecem no contrato</h4>
         <p><strong>A normalização acontece no DTO, não no service.</strong> O Jackson constrói o
@@ -1027,9 +1114,9 @@ footer {
           <p><strong>Carga inicial do catálogo.</strong> Controlada pela propriedade
             <code>app.seed.catalogo</code>, ligada nos perfis <code>dev</code> e
             <code>local</code>. É idempotente: nada acontece se o catálogo já tiver registros.
-            Sem ela não há como cadastrar competências que o motor de predição reconheça — um
-            vínculo criado à mão, com grafia divergente, produziria um vetor de atributos
-            silenciosamente incorreto.</p>
+            Traz as 30 tecnologias da pesquisa e 8 competências comportamentais. Como a aderência
+            técnica é calculada no backend, qualquer tecnologia do catálogo conta para o escore,
+            inclusive as cadastradas depois.</p>
         </div>
       </section>
 
@@ -1109,8 +1196,8 @@ footer {
           </div>
           <div class="ecard">
             <div class="ecard-h">Recomendacao</div>
-            <p>Uma execução do motor. Cada rodada gera um registro novo; o histórico é dado de
-              pesquisa.</p>
+            <p>Uma execução do motor, com as métricas da equipe gravadas no momento da geração.
+              Cada rodada gera um registro novo; o histórico é dado de pesquisa.</p>
             <div class="fields">projeto · origem · consultaOriginal · justificativaLlm ·
               coberturaPapeis · coberturaTecnologias · desvioPadraoSenioridade ·
               desvioPadraoScore · scoreMedioEquipe · observacaoRestricao</div>
@@ -1119,7 +1206,7 @@ footer {
             <div class="ecard-h">RecomendacaoMembro</div>
             <p>Uma posição no ranking. O ranking inteiro é gravado, não só os escolhidos.</p>
             <div class="fields">recomendacao · desenvolvedor · scoreAfinidade · papelSugerido ·
-              posicaoRanking · selecionado</div>
+              posicaoRanking · selecionado · aderenciaTecnica <em>0–1</em> · coberturaHoras <em>0–1</em></div>
           </div>
           <div class="ecard">
             <div class="ecard-h">Alocacao</div>
@@ -1186,8 +1273,8 @@ footer {
             <tbody>
               <tr>
                 <td class="mono">Senioridade</td>
-                <td>JUNIOR · PLENO · SENIOR · ESPECIALISTA</td>
-                <td>Dado <strong>ordinal</strong>: expõe escala 1–4 crescente</td>
+                <td>JUNIOR · PLENO · SENIOR</td>
+                <td>Dado <strong>ordinal</strong>: escala 1–3, a mesma do treino</td>
               </tr>
               <tr>
                 <td class="mono">PapelAtuacao</td>
@@ -1202,7 +1289,7 @@ footer {
               <tr>
                 <td class="mono">TipoHabilidade</td>
                 <td>HARD · SOFT</td>
-                <td>Separa colunas binárias do escore consolidado</td>
+                <td>Só HARD entra na aderência técnica; SOFT fica no escore consolidado</td>
               </tr>
               <tr>
                 <td class="mono">CategoriaHabilidade</td>
@@ -1212,7 +1299,7 @@ footer {
               <tr>
                 <td class="mono">StatusProjeto</td>
                 <td>PLANEJAMENTO · EM_ANDAMENTO · CONCLUIDO · CANCELADO</td>
-                <td>Define quais projetos consomem alocação</td>
+                <td>Só os dois primeiros consomem horas e recebem recomendação</td>
               </tr>
               <tr>
                 <td class="mono">OrigemRecomendacao</td>
@@ -1229,105 +1316,237 @@ footer {
       </section>
 
       <!-- ============================================================ -->
-      <section id="vetor">
-        <h2>O vetor de 39 atributos</h2>
-        <p class="sec-note">O que o backend vai enviar ao motor de predição na Fase 4.</p>
+      <section id="motor">
+        <h2>Motor de predição</h2>
+        <p class="sec-note">O modelo, o que ele recebe e como o backend chega nesses valores.</p>
 
-        <p>A matriz de treinamento tem <strong>33.462 registros</strong> e <strong>39
-          colunas</strong>. Montar esse vetor a partir do banco é o trabalho central da Fase 4 —
-          e o modelo de domínio da Fase 1 foi desenhado para que a conversão seja quase
-          mecânica.</p>
+        <p>O modelo é um <strong>LightGBM</strong> escolhido pelo <code>compare_models</code> do
+          PyCaret e otimizado com <code>tune_model</code>. Ele foi treinado sobre os
+          <strong>33.462</strong> perfis da pesquisa cruzados com cenários de projeto simulados, e
+          recebe <strong>13 variáveis</strong> por candidato: sete do desenvolvedor, três do
+          projeto e duas que só existem para o <em>par</em> desenvolvedor–projeto.</p>
 
         <div class="vector">
-          <span class="vslot hi">Nivel_Senioridade</span>
+          <span class="vslot">Nivel_Senioridade</span>
+          <span class="vslot">DevOps specialist</span>
+          <span class="vslot">Developer, QA or test</span>
           <span class="vslot">Developer, back-end</span>
           <span class="vslot">Developer, front-end</span>
           <span class="vslot">Developer, full-stack</span>
           <span class="vslot">Developer, mobile</span>
-          <span class="vslot">Developer, QA or test</span>
-          <span class="vslot">DevOps specialist</span>
-          <span class="vslot">Amazon Web Services (AWS)</span>
-          <span class="vslot">Angular</span>
-          <span class="vslot">C#</span>
-          <span class="vslot">Dart</span>
-          <span class="vslot">Django</span>
-          <span class="vslot">Docker</span>
-          <span class="vslot">FastAPI</span>
-          <span class="vslot">Flutter</span>
-          <span class="vslot">Go</span>
-          <span class="vslot">Google Cloud</span>
-          <span class="vslot">HTML/CSS</span>
-          <span class="vslot">Java</span>
-          <span class="vslot">JavaScript</span>
-          <span class="vslot">Kotlin</span>
-          <span class="vslot">Kubernetes</span>
-          <span class="vslot">Microsoft Azure</span>
-          <span class="vslot">Microsoft SQL Server</span>
-          <span class="vslot">MongoDB</span>
-          <span class="vslot">MySQL</span>
-          <span class="vslot">Next.js</span>
-          <span class="vslot">Node.js</span>
-          <span class="vslot">PostgreSQL</span>
-          <span class="vslot">Python</span>
-          <span class="vslot">React</span>
-          <span class="vslot">React Native</span>
-          <span class="vslot">Redis</span>
-          <span class="vslot">Spring Boot</span>
-          <span class="vslot">Swift</span>
-          <span class="vslot">TypeScript</span>
-          <span class="vslot">Vue.js</span>
-          <span class="vslot hi">Soft_Skills_Score</span>
-          <span class="vslot hi">Horas_Disponiveis</span>
+          <span class="vslot">Soft_Skills_Score</span>
+          <span class="vslot proj">Proj_Criticidade</span>
+          <span class="vslot proj">Proj_Requisito_Backend</span>
+          <span class="vslot proj">Proj_Requisito_Frontend</span>
+          <span class="vslot hi">Aderencia_Tecnica</span>
+          <span class="vslot hi">Cobertura_Horas</span>
         </div>
         <div class="legend">
-          <span><i class="swatch" style="background: var(--accent-soft); border: 1px solid var(--accent);"></i> valor contínuo ou ordinal</span>
-          <span><i class="swatch" style="background: var(--surface); border: 1px solid var(--line);"></i> coluna binária <span class="mono">0/1</span> — 6 papéis + 30 tecnologias</span>
+          <span><i class="swatch" style="background: var(--surface); border: 1px solid var(--line);"></i> do desenvolvedor</span>
+          <span><i class="swatch" style="background: var(--surface); border: 1px dashed var(--ink-3);"></i> do projeto</span>
+          <span><i class="swatch" style="background: var(--accent-soft); border: 1px solid var(--accent);"></i> relacional: calculada para cada par</span>
         </div>
 
-        <h4>Como cada posição é preenchida</h4>
+        <h4>Como cada variável é calculada</h4>
         <div class="tw">
           <table>
-            <thead><tr><th>Posições</th><th>Origem no banco</th><th>Transformação</th></tr></thead>
+            <thead><tr><th>Variável</th><th>Origem no banco</th><th>Cálculo</th></tr></thead>
             <tbody>
               <tr>
-                <td class="num">1</td>
+                <td class="mono">Nivel_Senioridade</td>
                 <td class="mono">Desenvolvedor.senioridade</td>
-                <td>Enum → <code>getValorOrdinal()</code>, escala 1–4</td>
+                <td>Júnior = 1, Pleno = 2, Sênior = 3</td>
               </tr>
               <tr>
-                <td class="num">2–7</td>
+                <td>6 papéis</td>
                 <td class="mono">Desenvolvedor.papelPrincipal</td>
-                <td><em>One-hot</em>: 1 na coluna do papel, 0 nas outras cinco</td>
+                <td><em>One-hot</em> pelo <code>chaveDataset</code> do enum: 1 no papel, 0 nos demais</td>
               </tr>
               <tr>
-                <td class="num">8–37</td>
-                <td class="mono">DesenvolvedorHabilidade</td>
-                <td>Proficiência &gt; 0 vira 1, casando por <code>chaveDataset</code></td>
-              </tr>
-              <tr>
-                <td class="num">38</td>
+                <td class="mono">Soft_Skills_Score</td>
                 <td class="mono">Desenvolvedor.softSkillsScore</td>
-                <td>Valor direto, 0,00 a 5,00</td>
+                <td>Valor direto, 0 a 5</td>
               </tr>
               <tr>
-                <td class="num">39</td>
-                <td class="mono">horasDisponiveis − horas alocadas</td>
-                <td>Disponibilidade <strong>real</strong>, descontando compromissos ativos</td>
+                <td class="mono">Proj_Criticidade</td>
+                <td class="mono">Projeto.criticidade</td>
+                <td>Baixa = 1, Média = 2, Alta = 3</td>
+              </tr>
+              <tr>
+                <td class="mono">Proj_Requisito_*</td>
+                <td class="mono">ProjetoPapelRequerido</td>
+                <td>Backend: exige BACKEND ou FULLSTACK. Frontend: exige FRONTEND ou FULLSTACK. Sem nenhum dos dois, ambos valem 1</td>
+              </tr>
+              <tr>
+                <td class="mono">Aderencia_Tecnica</td>
+                <td class="mono">DesenvolvedorHabilidade × ProjetoHabilidadeRequerida</td>
+                <td>Σ pesos das tecnologias HARD exigidas que a pessoa domina ÷ Σ pesos exigidos. Sem stack exigida, 1</td>
+              </tr>
+              <tr>
+                <td class="mono">Cobertura_Horas</td>
+                <td class="mono">horasDisponiveis − alocações em outros projetos</td>
+                <td>min(horas livres ÷ <code>horasSemanaisPorIntegrante</code>, 1)</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <p>A última linha é a mais importante. A disponibilidade enviada ao modelo não é o campo
-          bruto do cadastro: é o campo <em>menos</em> as horas já comprometidas em projetos
-          ativos. É isso que faz uma pessoa já lotada em dois projetos cair naturalmente no
-          ranking, sem nenhuma regra especial.</p>
+        <p>Os cálculos ficam em <code>MontadorVetorAtributos</code>, isolado e testado sem banco,
+          porque uma divergência em relação ao script de treinamento não gera erro nenhum: o
+          modelo apenas pontua algo diferente do que aprendeu. As duas últimas variáveis são
+          arredondadas em quatro casas, a mesma escala em que são gravadas.</p>
+
+        <h3>O contrato com o serviço</h3>
+        <p>O projeto vai uma vez; os candidatos vão em lote. O <em>one-hot</em> dos papéis é
+          montado no Python, onde o treino aconteceu.</p>
+        <pre><code><span class="k">POST</span> /predicoes
+{
+  <span class="k">"projeto"</span>: { "criticidade": 3, "requisitoBackend": true, "requisitoFrontend": false },
+  <span class="k">"candidatos"</span>: [
+    { "id": 1, "nivelSenioridade": 3, "papel": "Developer, back-end",
+      "softSkillsScore": 4.0, "aderenciaTecnica": 0.75, "coberturaHoras": 0.9 }
+  ]
+}
+<span class="c">→ { "algoritmo": "LGBMRegressor", "predicoes": [ { "id": 1, "score": 91.015 } ] }</span></code></pre>
+
+        <p>O serviço recusa com <strong>422</strong> tudo que está fora do domínio de treino:
+          senioridade 4, cobertura acima de 1, papel desconhecido, projeto sem nenhum requisito,
+          lote vazio ou <code>id</code> repetido. Árvores de decisão não falham com esses valores,
+          apenas os tratam como o extremo mais próximo, sem aviso. Se o <code>.pkl</code> carregado
+          não tiver exatamente as 13 colunas esperadas, o serviço nem sobe.</p>
+
+        <h4>O que foi verificado no modelo</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Verificação</th><th>Resultado</th></tr></thead>
+            <tbody>
+              <tr><td>Previsão contra a fórmula geradora sem ruído, 3.000 casos sorteados</td><td class="num">MAE 1,08 · RMSE 1,42</td></tr>
+              <tr><td>Cobertura de horas de 0 para 1 (criticidade alta)</td><td class="num">+15,4 pts</td></tr>
+              <tr><td>Aderência técnica de 0 para 1 (criticidade alta)</td><td class="num">+16,2 pts</td></tr>
+              <tr><td>Senioridade de júnior para sênior</td><td class="num">+25,1 pts</td></tr>
+              <tr><td>Pontuação de 3.000 candidatos</td><td class="num">16 ms</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>O fluxo de uma recomendação</h3>
+        <p>São três etapas, nesta ordem, para que a espera pelo motor não prenda uma conexão do
+          banco durante até 15 segundos de <em>timeout</em>:</p>
+        <ol>
+          <li><strong>Leitura</strong>, em transação somente leitura: projeto com papéis e stack,
+            desenvolvedores ativos com competências e horas já alocadas em outros projetos. As
+            variáveis são calculadas aqui.</li>
+          <li><strong>Motor</strong>, sem transação: <code>MotorPredicaoClient</code> envia o lote.
+            Falha de conexão, <em>timeout</em>, recusa ou candidato sem escore viram 503.</li>
+          <li><strong>Gravação</strong>: ordena por escore, com empate desfeito pelo nome, compõe a
+            equipe e grava a recomendação com as métricas e o ranking completo.</li>
+        </ol>
 
         <div class="note warn">
-          <p><strong>Contrato ainda não fechado.</strong> O formato exato de requisição e resposta
-            do serviço FastAPI — nomes dos campos JSON, se aceita um lote de candidatos ou um por
-            vez, se recebe também os atributos do projeto — depende do arquivo do modelo, que
-            ainda não está disponível. A Fase 4 começa por definir esse contrato.</p>
+          <p><strong>Duas armadilhas do ambiente Python.</strong> O <code>pip install pycaret</code>
+            traz o LightGBM 4.7.0, que derruba o processo com <code>access violation</code> ao
+            prever com este modelo; o <code>requirements.txt</code> fixa a 4.6.0. E o
+            <code>.pkl</code> não é versionado: precisa ser copiado para
+            <code>api_motor_predicao/</code> antes de subir o serviço.</p>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="composicao">
+        <h2>Composição e métricas</h2>
+        <p class="sec-note">O escore avalia pessoas uma a uma. A equipe precisa de regras.</p>
+
+        <h3>Como a equipe é formada</h3>
+        <p>As regras rodam depois do ranqueamento, em <code>ComposicaoEquipe</code>, na ordem
+          abaixo:</p>
+        <ol>
+          <li><strong>Elegibilidade.</strong> Só entra quem tem livres todas as horas semanais
+            exigidas, ou seja, <code>coberturaHoras = 1</code>. Um escore alto não compensa falta
+            de tempo. Inelegíveis continuam no ranking com <code>elegivel: false</code>.</li>
+          <li><strong>Vagas por papel.</strong> Cada vaga declarada vai para o elegível de maior
+            escore com exatamente aquele papel.</li>
+          <li><strong>Posições livres.</strong> O restante, até o tamanho da equipe, vai para os
+            maiores escores ainda não escolhidos, de qualquer papel.</li>
+        </ol>
+        <p>Sem elegíveis suficientes, a equipe sai <strong>parcial</strong> em vez de não haver
+          resultado, e o campo <code>observacaoRestricao</code> explica o que faltou: integrantes,
+          candidatos sem horas, vagas sem o papel exigido e tecnologias obrigatórias que ninguém
+          da equipe domina.</p>
+
+        <h3>As métricas de avaliação</h3>
+        <p>Calculadas por <code>CalculadoraMetricas</code> e gravadas na recomendação. A
+          calculadora não sabe como a equipe foi formada, e é por isso que serve também para a
+          linha de base.</p>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Métrica</th><th>Cálculo</th><th>Melhor quando</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">coberturaPapeis</td>
+                <td>Σ min(integrantes do papel, vagas do papel) ÷ vagas exigidas × 100</td>
+                <td>Maior</td>
+              </tr>
+              <tr>
+                <td class="mono">coberturaTecnologias</td>
+                <td>Σ pesos das tecnologias dominadas por ao menos um integrante ÷ Σ pesos × 100</td>
+                <td>Maior</td>
+              </tr>
+              <tr>
+                <td class="mono">desvioPadraoSenioridade</td>
+                <td>Desvio padrão populacional do nível 1–3 dos integrantes</td>
+                <td>Menor: equipe nivelada</td>
+              </tr>
+              <tr>
+                <td class="mono">desvioPadraoScore</td>
+                <td>Desvio padrão populacional dos escores dos integrantes</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="mono">scoreMedioEquipe</td>
+                <td>Média dos escores dos integrantes</td>
+                <td>Maior</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>O <code>min</code> da cobertura de papéis impede que três backends compensem a falta
+          de um frontend. Sem papéis ou sem stack exigidos, a cobertura correspondente é 100.</p>
+
+        <h3>Alocação e conflito entre projetos</h3>
+        <p>A recomendação só sugere. Quem consome horas é a <strong>alocação</strong>, criada
+          manualmente ou pela confirmação da equipe proposta, que aloca todos os selecionados de
+          uma vez, no esquema tudo ou nada. A partir daí, essas horas são descontadas na
+          <code>coberturaHoras</code> de qualquer outro projeto.</p>
+        <p>No teste de ponta a ponta com o modelo real, dois projetos disputavam os mesmos seis
+          desenvolvedores. Antes de confirmar o projeto A, as duas equipes propostas tinham três
+          pessoas em comum. Depois da confirmação, essas três passaram a inelegíveis no projeto B,
+          que foi montado sem nenhuma sobreposição. Tentar alocar uma delas à mão devolve 422 com
+          as horas livres que ela ainda tem.</p>
+
+        <h3>Linha de base aleatória</h3>
+        <p>Responde se a equipe proposta é melhor do que uma escolha sem critério. O endpoint
+          <code>GET /api/recomendacoes/{id}/linha-base</code> sorteia equipes do mesmo tamanho
+          <strong>apenas entre os elegíveis</strong> daquela recomendação, o mesmo grupo de onde
+          o protótipo escolhe, mede cada uma com a mesma calculadora e devolve média e desvio
+          padrão de cada métrica. A semente fixa torna o resultado reproduzível.</p>
+
+        <h4>Exemplo · cenário de teste, 6 desenvolvedores fictícios, 100 sorteios</h4>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Métrica</th><th>Protótipo</th><th>Aleatório (média ± desvio)</th></tr></thead>
+            <tbody>
+              <tr><td>Cobertura de papéis (%)</td><td class="num">100,00</td><td class="num">81,50 ± 24,14</td></tr>
+              <tr><td>Cobertura de tecnologias (%)</td><td class="num">86,67</td><td class="num">80,80 ± 14,21</td></tr>
+              <tr><td>Desvio padrão da senioridade</td><td class="num">0,471</td><td class="num">0,622 ± 0,220</td></tr>
+              <tr><td>Escore médio da equipe</td><td class="num">80,63</td><td class="num">70,29 ± 6,01</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          <p><strong>Esses números validam o mecanismo, não o trabalho.</strong> Vieram de dados
+            inventados para testar o fluxo. Os valores das tabelas de resultados precisam sair dos
+            cenários de avaliação definidos no texto, rodados logo após cada recomendação, já que
+            a linha de base usa requisitos e perfis atuais.</p>
         </div>
       </section>
 
@@ -1345,10 +1564,10 @@ footer {
               <p>A base sobre a qual tudo é construído, verificada rodando de verdade.</p>
               <ul>
                 <li>Projeto Maven com <em>wrapper</em> — não exige Maven instalado</li>
-                <li>Perfis <code>dev</code> (H2 em memória) e <code>local</code> (PostgreSQL)</li>
+                <li>Perfis <code>local</code> (PostgreSQL, o padrão) e <code>dev</code> (H2 em memória)</li>
                 <li>Swagger UI, Actuator, CORS externalizado</li>
-                <li><code>GlobalExceptionHandler</code> cobrindo 7 classes de erro</li>
-                <li>Segredos apenas por variável de ambiente</li>
+                <li><code>GlobalExceptionHandler</code> com um formato único de erro</li>
+                <li>Segredos apenas por variável de ambiente ou <code>.env</code></li>
               </ul>
             </div>
           </div>
@@ -1398,57 +1617,62 @@ footer {
             </div>
           </div>
 
-          <div class="phase" data-state="now">
+          <div class="phase" data-state="done">
             <div class="phase-n">4</div>
             <div class="phase-b">
-              <div class="phase-t"><h3>Integração com o motor de predição</h3><span class="pill" data-state="now">Próxima</span></div>
-              <p>A primeira travessia entre os dois ecossistemas.</p>
+              <div class="phase-t"><h3>Integração com o motor de predição</h3><span class="pill" data-state="done">Concluída</span></div>
+              <p>A primeira travessia entre os dois ecossistemas, testada de ponta a ponta com o
+                modelo real.</p>
               <ul>
-                <li>Cliente HTTP com <em>timeout</em> e tratamento de indisponibilidade</li>
-                <li>Montagem do vetor de 39 atributos a partir do banco</li>
-                <li><code>POST /api/projetos/{id}/recomendacoes</code> devolvendo o ranking</li>
-                <li>Persistência da execução e do ranking completo</li>
+                <li>Serviço FastAPI com contrato validado e 20 testes contra o modelo real</li>
+                <li>Cálculo das 13 variáveis, incluindo aderência técnica e cobertura de horas</li>
+                <li>Cliente HTTP com <em>timeout</em>; indisponibilidade vira 503</li>
+                <li>Recomendação gravada com o ranking completo e as variáveis de cada candidato</li>
+                <li>Senioridade reduzida a 3 níveis, os mesmos do treino</li>
               </ul>
             </div>
           </div>
 
-          <div class="phase">
+          <div class="phase" data-state="done">
             <div class="phase-n">5</div>
             <div class="phase-b">
-              <div class="phase-t"><h3>Regras de composição da equipe</h3><span class="pill">Planejada</span></div>
-              <p>Onde as métricas do trabalho deixam de ser texto e viram código executável.</p>
+              <div class="phase-t"><h3>Regras de composição da equipe</h3><span class="pill" data-state="done">Concluída</span></div>
+              <p>Onde as métricas do trabalho deixaram de ser texto e viraram código executável.</p>
               <ul>
-                <li>Cobertura de papéis e cobertura de tecnologias</li>
-                <li>Dispersão: desvio padrão de senioridade e de escore</li>
-                <li>Conflito de alocação entre projetos simultâneos</li>
-                <li>Cenário de escassez: montar a melhor equipe possível e registrar a restrição</li>
+                <li>Elegibilidade por horas, vagas por papel e posições livres</li>
+                <li>Cobertura de papéis, cobertura de tecnologias, dispersão e escore médio</li>
+                <li>Equipe parcial com a restrição explicada (cenário de escassez)</li>
+                <li>Alocações e confirmação da equipe, com bloqueio de conflito de horas</li>
+                <li>Linha de base aleatória entre os elegíveis, reproduzível por semente</li>
               </ul>
             </div>
           </div>
 
-          <div class="phase">
+          <div class="phase" data-state="done">
             <div class="phase-n">6</div>
             <div class="phase-b">
-              <div class="phase-t"><h3>Interface conversacional</h3><span class="pill">Planejada</span></div>
-              <p>Spring AI e Gemini, no papel duplo previsto na metodologia.</p>
+              <div class="phase-t"><h3>Interface conversacional</h3><span class="pill" data-state="done">Concluída</span></div>
+              <p>Spring AI e Gemini, no papel duplo previsto na metodologia. Validada com o <code>gemini-2.5-flash</code>.</p>
               <ul>
-                <li><strong>Na saída:</strong> justificativa em linguagem natural da equipe sugerida</li>
-                <li><strong>Na entrada:</strong> extração de parâmetros a partir de texto livre</li>
-                <li><em>System prompts</em> versionados junto do código</li>
-                <li>Endpoint de conversa com histórico</li>
+                <li><strong>Na saída:</strong> <code>POST /api/recomendacoes/{id}/justificativa</code>, a partir do ranking, das métricas e das restrições gravadas; o texto fica na recomendação e <code>regerar=true</code> pede outro</li>
+                <li><strong>Na entrada:</strong> extração de parâmetros a partir de texto livre (<code>POST /api/recomendacoes/conversa</code>)</li>
+                <li><em>System prompts</em> versionados em <code>resources/prompts</code></li>
+                <li>Conversa em turnos (<code>POST /api/recomendacoes/conversa/turnos</code>): o cliente envia o histórico, o backend pergunta o que falta e, completo, cria o projeto e a recomendação com origem <code>CHAT</code></li>
+                <li>Sem chave configurada, os endpoints respondem 503 explicando o que falta; o resto da API segue funcionando</li>
               </ul>
             </div>
           </div>
 
-          <div class="phase">
+          <div class="phase" data-state="now">
             <div class="phase-n">7</div>
             <div class="phase-b">
-              <div class="phase-t"><h3>Fechamento</h3><span class="pill">Planejada</span></div>
+              <div class="phase-t"><h3>Fechamento</h3><span class="pill" data-state="now">Em andamento</span></div>
               <p>O que transforma o protótipo em algo que a banca consegue executar.</p>
               <ul>
-                <li>Testes de integração ponta a ponta</li>
-                <li><code>Dockerfile</code> e <code>docker-compose</code> com o PostgreSQL</li>
-                <li>Carga de dados dos cenários de avaliação</li>
+                <li><strong>Feito:</strong> carga e execução dos quatro cenários de avaliação (<code>avaliacao/cenarios.py</code>)</li>
+                <li><strong>Feito:</strong> frontend React em <code>frontend/</code> — cadastros, projetos, recomendação com linha de base e justificativa, assistente conversacional</li>
+                <li><code>Dockerfile</code> do backend e do motor; o <code>docker-compose</code> do PostgreSQL já existe</li>
+                <li>Testes ponta a ponta automatizados</li>
               </ul>
             </div>
           </div>
@@ -1471,6 +1695,31 @@ footer {
                 <td>Bate com o texto do TFG e garante o Spring AI na Fase 6</td>
               </tr>
               <tr>
+                <td>Aderência e cobertura calculadas no backend</td>
+                <td>Enviar a stack inteira do projeto ao modelo</td>
+                <td>Treze colunas em vez de dezenas; cada termo da fórmula vira uma variável rastreável</td>
+              </tr>
+              <tr>
+                <td>Disponibilidade como regra de elegibilidade</td>
+                <td>Deixar só o peso no modelo</td>
+                <td>Os cenários de escassez e conflito ficam determinísticos e explicáveis</td>
+              </tr>
+              <tr>
+                <td>Chamada ao motor fora da transação</td>
+                <td><code>@Transactional</code> no método inteiro</td>
+                <td>Uma lentidão do motor não prende conexão do banco</td>
+              </tr>
+              <tr>
+                <td>Linha de base só entre elegíveis</td>
+                <td>Sortear entre todos os ativos</td>
+                <td>Comparação mais rigorosa: a única diferença passa a ser o critério de escolha</td>
+              </tr>
+              <tr>
+                <td>Senioridade com 3 níveis</td>
+                <td>Manter <code>ESPECIALISTA</code> = 4</td>
+                <td>O modelo só viu 1–3; um quarto nível seria tratado como sênior sem aviso</td>
+              </tr>
+              <tr>
                 <td><code>ddl-auto: update</code></td>
                 <td>Flyway versionado</td>
                 <td>Mais rápido agora; o esquema não fica versionado. Flyway pode ser plugado depois sem refazer o domínio</td>
@@ -1490,11 +1739,6 @@ footer {
                 <td>Só os selecionados</td>
                 <td>Mais linhas no banco, em troca de transparência e contexto para o LLM</td>
               </tr>
-              <tr>
-                <td>H2 no perfil <code>dev</code></td>
-                <td>Só PostgreSQL</td>
-                <td>Roda sem instalar nada; exige conferir o esquema no Postgres antes da entrega</td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -1512,16 +1756,27 @@ footer {
         <h2>Como rodar e testar</h2>
         <p class="sec-note">Não é preciso instalar Maven — o projeto traz o <em>wrapper</em>.</p>
 
-        <h4>Subir a aplicação</h4>
-        <p>Pelo IntelliJ, basta executar a classe <code>TeamrecApplication</code>: o perfil
-          <code>dev</code> é o padrão e não exige nenhuma configuração. Pelo terminal:</p>
-        <pre><code><span class="c"># perfil dev — H2 em memória, zero instalação</span>
-cd backend
-./mvnw spring-boot:run
+        <h4>1 · Banco de dados</h4>
+        <p>O perfil padrão é <code>local</code>, com PostgreSQL. As credenciais ficam em um único
+          <code>.env</code>, lido tanto pelo Docker quanto pelo Spring:</p>
+        <pre><code>cd backend
+cp .env.example .env          <span class="c"># defina DB_PASSWORD</span>
+docker compose up -d          <span class="c"># PostgreSQL 17 em localhost:5433</span></code></pre>
+        <p>A porta 5433 evita conflito com um PostgreSQL instalado na máquina. Para usar o
+          instalado, ajuste <code>DB_PORT=5432</code> no <code>.env</code> e crie o banco
+          <code>teamrec</code>.</p>
 
-<span class="c"># perfil local — PostgreSQL</span>
-<span class="k">export</span> DB_PASSWORD=sua-senha
-./mvnw spring-boot:run -Dspring-boot.run.profiles=local</code></pre>
+        <h4>2 · Motor de predição</h4>
+        <pre><code>cd api_motor_predicao        <span class="c"># com motor_predicao_tcc.pkl nesta pasta</span>
+python -m venv .venv
+.venv/Scripts/python.exe -m pip install -r requirements.txt
+.venv/Scripts/python.exe -m uvicorn app.main:app --port 8000</code></pre>
+        <p>Só é necessário para gerar recomendações; o restante da API funciona sem ele.</p>
+
+        <h4>3 · Backend</h4>
+        <pre><code>cd backend
+./mvnw spring-boot:run                                   <span class="c"># perfil local</span>
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev    <span class="c"># H2 em memória, sem Docker</span></code></pre>
         <p>Está no ar quando o log mostrar <code>Started TeamrecApplication</code>.</p>
 
         <div class="tw">
@@ -1532,94 +1787,88 @@ cd backend
               <tr><td class="mono">localhost:8080/v3/api-docs</td><td>Contrato OpenAPI em JSON</td></tr>
               <tr><td class="mono">localhost:8080/actuator/health</td><td>Verificação de saúde</td></tr>
               <tr><td class="mono">localhost:8080/h2-console</td><td>Console do banco — só no perfil <code>dev</code></td></tr>
+              <tr><td class="mono">localhost:8000/docs</td><td>Swagger do motor de predição</td></tr>
             </tbody>
           </table>
         </div>
 
-        <h3>Inspecionar o banco no perfil dev</h3>
-        <p>O console do H2 abre em <code>localhost:8080/h2-console</code>. O campo
-          <strong>JDBC URL</strong> vem preenchido com um valor genérico e
-          <strong>precisa ser substituído</strong> — é o erro mais comum ao conectar:</p>
+        <h3>Inspecionar o banco</h3>
+        <p>No perfil <code>local</code>, conecte pelo pgAdmin ou DBeaver em
+          <code>localhost:5433</code>, banco <code>teamrec</code>, com o usuário e a senha do
+          <code>.env</code>. Os dados persistem entre reinícios.</p>
+        <p>No perfil <code>dev</code>, o console do H2 abre em <code>localhost:8080/h2-console</code>.
+          O campo <strong>JDBC URL</strong> vem preenchido com um valor genérico e
+          <strong>precisa ser substituído</strong>:</p>
 
         <div class="tw">
           <table>
             <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
             <tbody>
               <tr><td>Driver Class</td><td class="mono">org.h2.Driver</td></tr>
-              <tr><td><strong>JDBC URL</strong></td><td class="mono">jdbc:h2:mem:teamrec;DB_CLOSE_DELAY=-1;MODE=PostgreSQL</td></tr>
+              <tr><td><strong>JDBC URL</strong></td><td class="mono">jdbc:h2:mem:teamrec</td></tr>
               <tr><td>User Name</td><td class="mono">sa</td></tr>
               <tr><td>Password</td><td><em>vazio</em></td></tr>
             </tbody>
           </table>
         </div>
 
-        <div class="note warn">
-          <p><strong>O banco vive em memória.</strong> Tudo é descartado quando a aplicação para,
-            e o catálogo de 38 competências é recriado a cada inicialização. É intencional no
-            perfil <code>dev</code>: cada execução parte de um estado limpo e reprodutível.</p>
-        </div>
-
         <p>Consultas para começar:</p>
-        <pre><code><span class="c">-- As 30 tecnologias e a coluna correspondente na matriz de treinamento</span>
-<span class="k">SELECT</span> NOME, CHAVE_DATASET, CATEGORIA <span class="k">FROM</span> HABILIDADE
-<span class="k">WHERE</span> CHAVE_DATASET <span class="k">IS NOT NULL</span> <span class="k">ORDER BY</span> NOME;
+        <pre><code><span class="c">-- A equipe proposta na última recomendação, com as variáveis usadas</span>
+<span class="k">SELECT</span> d.NOME, m.POSICAO_RANKING, m.SCORE_AFINIDADE,
+       m.ADERENCIA_TECNICA, m.COBERTURA_HORAS, m.SELECIONADO
+<span class="k">FROM</span> RECOMENDACAO_MEMBRO m
+<span class="k">JOIN</span> DESENVOLVEDOR d <span class="k">ON</span> d.ID = m.DESENVOLVEDOR_ID
+<span class="k">WHERE</span> m.RECOMENDACAO_ID = (<span class="k">SELECT MAX</span>(ID) <span class="k">FROM</span> RECOMENDACAO)
+<span class="k">ORDER BY</span> m.POSICAO_RANKING;
 
-<span class="c">-- Desenvolvedores com suas competências e proficiências</span>
-<span class="k">SELECT</span> d.NOME, d.SENIORIDADE, d.PAPEL_PRINCIPAL,
-       h.NOME <span class="k">AS</span> COMPETENCIA, dh.PROFICIENCIA
-<span class="k">FROM</span> DESENVOLVEDOR d
-<span class="k">JOIN</span> DESENVOLVEDOR_HABILIDADE dh <span class="k">ON</span> dh.DESENVOLVEDOR_ID = d.ID
-<span class="k">JOIN</span> HABILIDADE h <span class="k">ON</span> h.ID = dh.HABILIDADE_ID
-<span class="k">ORDER BY</span> d.NOME;
+<span class="c">-- Métricas e restrições de cada execução</span>
+<span class="k">SELECT</span> ID, PROJETO_ID, COBERTURA_PAPEIS, COBERTURA_TECNOLOGIAS,
+       DESVIO_PADRAO_SENIORIDADE, SCORE_MEDIO_EQUIPE, OBSERVACAO_RESTRICAO
+<span class="k">FROM</span> RECOMENDACAO <span class="k">ORDER BY</span> ID;
 
-<span class="c">-- Papéis exigidos por projeto</span>
-<span class="k">SELECT</span> p.NOME, pp.PAPEL, pp.QUANTIDADE
-<span class="k">FROM</span> PROJETO p
-<span class="k">JOIN</span> PROJETO_PAPEL_REQUERIDO pp <span class="k">ON</span> pp.PROJETO_ID = p.ID;</code></pre>
+<span class="c">-- Horas comprometidas por desenvolvedor</span>
+<span class="k">SELECT</span> d.NOME, d.HORAS_DISPONIVEIS, <span class="k">SUM</span>(a.HORAS_SEMANAIS) <span class="k">AS</span> ALOCADAS
+<span class="k">FROM</span> ALOCACAO a <span class="k">JOIN</span> DESENVOLVEDOR d <span class="k">ON</span> d.ID = a.DESENVOLVEDOR_ID
+<span class="k">WHERE</span> a.ATIVA = <span class="k">TRUE</span>
+<span class="k">GROUP BY</span> d.NOME, d.HORAS_DISPONIVEIS;</code></pre>
 
         <h3>Exercitar a API</h3>
-        <p>Há dois caminhos, com propósitos diferentes.</p>
+        <p><strong>Swagger UI</strong>, em <code>localhost:8080/swagger-ui.html</code>, lista as
+          28 rotas com seus campos e um botão para executar direto do navegador.</p>
 
-        <p><strong>Swagger UI</strong>, em <code>localhost:8080/swagger-ui.html</code>, lista os
-          19 endpoints com seus campos e um botão para executar direto do navegador. É o melhor
-          recurso para explorar o contrato.</p>
-
-        <p><strong>O arquivo <code>backend/api.http</code></strong> traz um roteiro de 37
-          requisições encadeadas, executáveis uma a uma pelo cliente HTTP do IntelliJ. Ele captura
-          os identificadores automaticamente — os das competências, o do desenvolvedor criado, o
-          do projeto —, de modo que nenhum valor precisa ser copiado manualmente entre
-          requisições.</p>
+        <p><strong>O arquivo <code>backend/api.http</code></strong> traz um roteiro de requisições
+          encadeadas para o cliente HTTP do IntelliJ. Ele captura os identificadores
+          automaticamente, então nenhum valor precisa ser copiado entre requisições.</p>
 
         <div class="tw">
           <table>
             <thead><tr><th>Requisições</th><th>O que demonstram</th></tr></thead>
             <tbody>
-              <tr><td class="num">1–7</td><td>Catálogo carregado, com a chave de cada tecnologia no modelo</td></tr>
-              <tr><td class="num">8–16</td><td>Três perfis distintos, paginação, filtros combinados e ajuste de disponibilidade</td></tr>
-              <tr><td class="num">17–20</td><td>Os erros: 409 duplicado, 400 fora de escala, 404 inexistente, 422 repetido</td></tr>
-              <tr><td class="num">21–28</td><td>Projeto com papéis e stack, e as três validações que devolvem 422</td></tr>
+              <tr><td class="num">1–7</td><td>Catálogo carregado, cadastro e os erros de habilidade</td></tr>
+              <tr><td class="num">8–20</td><td>Perfis, paginação, filtros, ajuste de disponibilidade e os erros de cadastro</td></tr>
+              <tr><td class="num">21–28</td><td>Projeto com papéis e stack, as validações que devolvem 422 e a mudança de status</td></tr>
+              <tr><td class="num">28a–28f</td><td>Recomendação, linha de base, confirmação da equipe e conflito de alocação — exigem o motor</td></tr>
               <tr><td class="num">29–34</td><td>Exclusão lógica: nada desaparece da base</td></tr>
               <tr><td class="num">35–37</td><td>O formato de erro é o mesmo em qualquer rota</td></tr>
             </tbody>
           </table>
         </div>
 
-        <p>Duas requisições merecem atenção enquanto rodam. A de número 8 envia o e-mail como
-          <code>"  ANA.SOUZA@UFN.EDU.BR "</code>, de propósito, e a resposta volta normalizada —
-          há uma asserção automática verificando isso. A de número 16 ajusta apenas a
-          disponibilidade e preserva as competências, demonstrando por que essa operação é
-          separada do <code>PUT</code>.</p>
-
         <h4>Testes automatizados</h4>
-        <pre><code>./mvnw test   <span class="c"># 53 testes: contexto, persistência, catálogo e API</span></code></pre>
+        <pre><code>cd backend && ./mvnw test                          <span class="c"># 107 testes, sempre no perfil dev</span>
+cd api_motor_predicao && .venv/Scripts/python.exe -m pytest   <span class="c"># 20 testes com o modelo real</span></code></pre>
+        <p>No backend, o motor é substituído por um dublê nos testes de API; o que se verifica é
+          a orquestração. Composição, métricas e linha de base têm testes unitários com valores
+          calculados à mão.</p>
 
         <h4>Configuração</h4>
-        <p>Copie <code>.env.example</code> para <code>.env</code> e preencha. Nenhum segredo é
-          versionado: <code>DB_PASSWORD</code>, <code>GEMINI_API_KEY</code>,
-          <code>PREDICTION_BASE_URL</code> e <code>APP_CORS_ORIGINS</code> vêm todos do ambiente.</p>
+        <p>Variáveis do <code>.env</code>: <code>DB_NAME</code>, <code>DB_PORT</code>,
+          <code>DB_USERNAME</code>, <code>DB_PASSWORD</code> (ou <code>DB_URL</code> completa),
+          <code>PREDICTION_BASE_URL</code>, <code>GEMINI_API_KEY</code> e
+          <code>APP_CORS_ORIGINS</code>. Nenhum segredo é versionado.</p>
 
-        <h4>Quando a porta 8080 aparecer ocupada</h4>
-        <p>Normalmente é um processo Java órfão de uma execução anterior — o
+        <h4>Quando a porta 8080 ou 8000 aparecer ocupada</h4>
+        <p>Normalmente é um processo órfão de uma execução anterior — o
           <code>spring-boot:run</code> executa a aplicação em um processo separado, que sobrevive
           ao encerramento do Maven. Para identificar e encerrar:</p>
         <pre><code>Get-Process -Id (Get-NetTCPConnection -LocalPort 8080 -State Listen).OwningProcess
@@ -1636,24 +1885,34 @@ Stop-Process -Id &lt;PID&gt; -Force</code></pre>
             <thead><tr><th>Item</th><th>Situação</th><th>Quando resolve</th></tr></thead>
             <tbody>
               <tr>
-                <td>Arquivo do modelo treinado</td>
-                <td>Não localizado na máquina; a pasta <code>api_motor_predicao</code> está vazia</td>
-                <td>Bloqueia a Fase 4</td>
+                <td>Cenários de avaliação</td>
+                <td>Executados; resultados em <code>avaliacao/resultados/</code>. Rodar de novo exige o backend no perfil <code>dev</code> com a base vazia</td>
+                <td>Refazer só se o modelo ou as regras mudarem</td>
               </tr>
               <tr>
-                <td>Serviço FastAPI</td>
-                <td>Contrato de entrada e saída ainda não definido</td>
-                <td>Início da Fase 4</td>
+                <td>RMSE e R² do treino</td>
+                <td>Ainda como <code>[PREENCHER]</code> no texto; saem do <code>tune_model</code></td>
+                <td>Com a saída do Colab</td>
               </tr>
               <tr>
                 <td>Esquema no PostgreSQL real</td>
-                <td>Validado apenas em H2 no modo PostgreSQL</td>
-                <td>Assim que o banco for instalado</td>
+                <td>Testes rodam em H2. Um desenvolvedor gravado como <code>ESPECIALISTA</code> impede o carregamento</td>
+                <td>Na primeira execução no perfil <code>local</code></td>
               </tr>
               <tr>
-                <td>Chave da API do Gemini</td>
-                <td>Ainda não provisionada</td>
-                <td>Antes da Fase 6</td>
+                <td>Campo <code>usadaNoModelo</code> das habilidades</td>
+                <td>Nome enganoso: toda habilidade HARD influencia o escore via aderência técnica. O frontend o exibe apenas como "tem coluna nos dados de treinamento", sem afirmar influência no escore</td>
+                <td>Renomear no backend quando for conveniente</td>
+              </tr>
+              <tr>
+                <td>Scan de segurança e de dependências</td>
+                <td>Semgrep ainda não executado nos arquivos das Fases 4 e 5 nem nas dependências novas</td>
+                <td>Antes de encerrar a Fase 5 formalmente</td>
+              </tr>
+              <tr>
+                <td>Chave <code>chaveDataset</code> duplicada</td>
+                <td>A coluna é única no banco, mas o serviço só confere o nome; a duplicata volta como 409 genérico de integridade</td>
+                <td>Validar no <code>HabilidadeService</code> com mensagem própria</td>
               </tr>
               <tr>
                 <td>Chave da Groq no projeto antigo</td>
@@ -1663,15 +1922,12 @@ Stop-Process -Id &lt;PID&gt; -Force</code></pre>
             </tbody>
           </table>
         </div>
-
-        <p>Nenhum desses itens bloqueia as Fases 2 e 3, que dependem apenas do modelo de domínio
-          já concluído.</p>
       </section>
 
       <footer>
         <p>Documentação do módulo backend · Sistema Web de Recomendação para Formação de Equipes
           em Projetos de Desenvolvimento de Software · Universidade Franciscana, Santa Maria — RS.
-          Reflete o estado do código ao final da Fase 3.</p>
+          Reflete o estado do código ao final da Fase 6, com o frontend implementado.</p>
       </footer>
 
     </main>

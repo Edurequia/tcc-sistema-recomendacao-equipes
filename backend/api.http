@@ -342,6 +342,72 @@ GET {{host}}/api/projetos/{{idProjeto}}/recomendacoes
 ### 28c2. Linha de base: a equipe proposta contra 100 equipes sorteadas entre os elegíveis
 GET {{host}}/api/recomendacoes/{{idRecomendacao}}/linha-base?sorteios=100&semente=42
 
+### 28c3. Justificativa da equipe pelo modelo de linguagem
+### Sem GEMINI_API_KEY e SPRING_AI_MODEL_CHAT=google-genai no .env, responde 503
+### explicando o que falta — o resto da API continua funcionando.
+POST {{host}}/api/recomendacoes/{{idRecomendacao}}/justificativa
+
+### 28c4. Mesma chamada de novo: devolve o texto já gravado, sem consultar o modelo
+### (repare em "geradaAgora": false)
+POST {{host}}/api/recomendacoes/{{idRecomendacao}}/justificativa
+
+### 28c5. Forçar uma nova redação, ignorando a que está gravada
+POST {{host}}/api/recomendacoes/{{idRecomendacao}}/justificativa?regerar=true
+
+### 28c6. Via conversacional: o texto vira projeto e recomendação em uma chamada
+### O modelo extrai os requisitos, o projeto é criado com as mesmas validações do
+### formulário e a recomendação fica gravada com origem CHAT e a consulta original.
+### Sem a integração ligada, responde 503.
+POST {{host}}/api/recomendacoes/conversa
+Content-Type: application/json
+
+{
+  "consulta": "Preciso montar uma equipe de 4 pessoas para o Portal do Aluno, um projeto crítico em Java, Spring Boot e React, com 20 horas semanais por integrante. São necessários dois desenvolvedores de backend, um de frontend e um de QA."
+}
+
+### 28c7. Texto vago — espera 422 dizendo o que faltou
+POST {{host}}/api/recomendacoes/conversa
+Content-Type: application/json
+
+{
+  "consulta": "preciso de um time bom para um projeto novo o quanto antes"
+}
+
+### 28c8. Conversa com histórico — primeiro turno, pedido incompleto
+### Espera 200 com "status": "PERGUNTA" e a pergunta nomeando o que falta.
+POST {{host}}/api/recomendacoes/conversa/turnos
+Content-Type: application/json
+
+{
+  "mensagens": [
+    { "autor": "GESTOR", "texto": "Quero montar uma equipe para o Portal do Aluno, em Java e React." }
+  ]
+}
+
+### 28c9. Conversa com histórico — o gestor responde e a recomendação sai
+### O cliente reenvia a conversa inteira; espera 200 com "status": "RECOMENDACAO".
+POST {{host}}/api/recomendacoes/conversa/turnos
+Content-Type: application/json
+
+{
+  "mensagens": [
+    { "autor": "GESTOR", "texto": "Quero montar uma equipe para o Portal do Aluno, em Java e React." },
+    { "autor": "ASSISTENTE", "texto": "Para montar a equipe, ainda preciso saber o tamanho da equipe e as horas semanais por integrante." },
+    { "autor": "GESTOR", "texto": "São 4 pessoas, 20 horas semanais cada, sendo dois de backend e um de frontend. É um projeto crítico." }
+  ]
+}
+
+### 28c10. Conversa terminada no assistente — espera 400
+POST {{host}}/api/recomendacoes/conversa/turnos
+Content-Type: application/json
+
+{
+  "mensagens": [
+    { "autor": "GESTOR", "texto": "Quero uma equipe." },
+    { "autor": "ASSISTENTE", "texto": "Quantas pessoas?" }
+  ]
+}
+
 ### 28d. Confirmar a equipe proposta: aloca os selecionados no projeto
 POST {{host}}/api/recomendacoes/{{idRecomendacao}}/confirmacao
 

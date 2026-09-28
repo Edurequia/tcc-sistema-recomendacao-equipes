@@ -34,7 +34,7 @@ aplica as regras de composição da equipe.
 | Spring Boot | 3.5.16 |
 | PostgreSQL | perfil `local` |
 | H2 (em memória) | perfil `dev` |
-| Spring AI + Gemini | 1.1.8 — entra na Fase 6 |
+| Spring AI + Gemini | 1.1.8 (`gemini-2.5-flash` por padrão) |
 | springdoc-openapi | 2.8.13 |
 | MapStruct / Lombok | 1.6.3 / 1.18.36 |
 
@@ -61,6 +61,9 @@ só lugar. Para usar um PostgreSQL instalado na máquina em vez do container, aj
 ```
 
 Os testes automatizados usam sempre o perfil `dev`.
+
+**Frontend** (React): instruções em [`../frontend/README.md`](../frontend/README.md).
+Com o backend no ar, `cd ../frontend && npm install && npm run dev` abre em <http://localhost:5173>.
 
 **Motor de predição** (necessário para gerar recomendações; o restante da API funciona
 sem ele). Instruções completas em [`../api_motor_predicao/README.md`](../api_motor_predicao/README.md):
@@ -137,8 +140,8 @@ A distinção é o que permite detectar conflito entre projetos simultâneos.
 - [x] **Fase 3** — CRUD de Projeto e seus requisitos
 - [x] **Fase 4** — Cliente do motor de predição + endpoint de recomendação
 - [x] **Fase 5** — Regras de composição: cobertura de papéis/tecnologias, dispersão, conflito de alocação
-- [ ] **Fase 6** — Spring AI + Gemini: justificativa e extração de entidades
-- [ ] **Fase 7** — Testes de integração, Docker, observabilidade
+- [x] **Fase 6** — Spring AI + Gemini: justificativa e extração de entidades
+- [ ] **Fase 7** — Fechamento: cenários executados e frontend pronto; faltam Docker e testes ponta a ponta
 
 ## Recomendações (Fases 4 e 5)
 
@@ -220,3 +223,20 @@ alocada no projeto → 409; projeto encerrado ou desenvolvedor inativo → 422.
 É a alocação — e não a recomendação — que consome horas. Confirmar a equipe do projeto A
 reduz a `coberturaHoras` desses profissionais no projeto B, que passam a inelegíveis
 (Cenário 4, conflito entre projetos simultâneos).
+
+## Modelo de linguagem (Fase 6)
+
+Desligado por padrão. Para ligar, defina no `.env` `SPRING_AI_MODEL_CHAT=google-genai` e
+`GEMINI_API_KEY` (opcional: `LLM_MODELO`). Sem isso, os endpoints abaixo respondem **503**
+explicando o que falta, e o restante da API funciona normalmente.
+
+| Método | Rota | O quê |
+|---|---|---|
+| POST | `/api/recomendacoes/{id}/justificativa` | texto explicando a equipe, a partir do ranking, das métricas e das restrições gravadas. Reaproveita o texto já gravado; `regerar=true` pede outro |
+| POST | `/api/recomendacoes/conversa` | pedido em texto livre, de uma vez: extrai os requisitos, cria o projeto e gera a recomendação (201) |
+| POST | `/api/recomendacoes/conversa/turnos` | conversa em turnos: recebe o histórico completo (até 20 mensagens) e devolve uma pergunta nomeando o que falta (`PERGUNTA`) ou a recomendação gerada (`RECOMENDACAO`) |
+
+Os *system prompts* ficam em `src/main/resources/prompts/`. A pergunta de cada turno é
+montada pelo backend, e não pelo modelo, para nomear exatamente os campos que faltam
+(nome do projeto, tamanho da equipe e horas semanais) sem gastar uma segunda chamada.
+A recomendação criada pela conversa é gravada com origem `CHAT` e a consulta original.

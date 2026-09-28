@@ -18,6 +18,23 @@ spring:
     deserialization:
       fail-on-unknown-properties: false
 
+  # Modelo de linguagem (Fase 6). Desligado por padrao: sem chave de API nao ha
+  # bean de ChatModel, e o endpoint de justificativa responde 503 explicando o
+  # que falta, em vez de a aplicacao nao subir. Para ligar, defina no .env
+  # SPRING_AI_MODEL_CHAT=google-genai e GEMINI_API_KEY.
+  ai:
+    model:
+      chat: ${SPRING_AI_MODEL_CHAT:none}
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY:}
+        chat:
+          options:
+            model: ${LLM_MODELO:gemini-2.5-flash}
+            # Justificativa e texto tecnico sobre dados fechados: pouca margem
+            # para variacao criativa.
+            temperature: 0.2
+
 server:
   port: ${SERVER_PORT:8080}
   error:
