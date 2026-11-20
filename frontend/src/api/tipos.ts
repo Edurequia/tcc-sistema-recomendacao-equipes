@@ -230,6 +230,8 @@ export interface Recomendacao {
   metricas: MetricasEquipe
   observacaoRestricao?: string
   justificativaLlm?: string
+  /** Por que a justificativa nao veio junto; so chega na resposta da geracao. */
+  avisoJustificativa?: string
   ranking: MembroRanking[]
 }
 

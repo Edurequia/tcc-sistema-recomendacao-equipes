@@ -29,10 +29,12 @@ public interface ProjetoRepository extends JpaRepository<Projeto, Long> {
     /**
      * Listagem paginada com filtros opcionais.
      * Cada filtro nulo se anula na propria clausula.
+     * O cast do nome evita o lower(bytea) do PostgreSQL com parametro nulo.
      */
     @Query("""
             select p from Projeto p
-            where (:nome is null or lower(p.nome) like lower(concat('%', :nome, '%')))
+            where (cast(:nome as String) is null
+                   or lower(p.nome) like lower(concat('%', cast(:nome as String), '%')))
               and (:status is null or p.status = :status)
               and (:criticidade is null or p.criticidade = :criticidade)
             """)

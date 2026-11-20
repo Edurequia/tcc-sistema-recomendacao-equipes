@@ -1,0 +1,140 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{gray!10},
+  frame=single, rulecolor=\color{gray!40},
+  columns=fullflexible, breaklines=true,
+  literate={á}{{\'a}}1 {ã}{{\~a}}1 {é}{{\'e}}1 {ç}{{\c{c}}}1 {ó}{{\'o}}1
+}
+
+\title{Sistema Web de Recomendação para Formação de Equipes\\
+\large Repositório e instruções de execução local}
+\author{Eduardo Requia Souza \\ Orientador: Alexandre de Oliveira Zamberlan \\
+Sistemas de Informação --- UFN}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Repositório}
+
+Código-fonte completo (frontend, backend, motor de predição e scripts de avaliação):
+
+\begin{center}
+\url{https://github.com/Edurequia/tcc-sistema-recomendacao-equipes}
+\end{center}
+
+\begin{tabular}{@{}ll@{}}
+\toprule
+Pasta & Conteúdo \\
+\midrule
+\texttt{frontend/} & Interface web (React + TypeScript) \\
+\texttt{backend/} & Orquestrador (Java 21, Spring Boot 3, Spring AI) \\
+\texttt{api\_motor\_predicao/} & Motor de predição (Python 3.10, FastAPI, PyCaret/LightGBM) \\
+\texttt{avaliacao/} & Carga de dados e execução dos quatro cenários \\
+\bottomrule
+\end{tabular}
+
+\medskip
+O sistema não possui autenticação: ao abrir o endereço local, todas as telas ficam acessíveis, sem usuário e senha.
+
+\section{Pré-requisitos}
+
+\begin{itemize}[noitemsep]
+  \item Git;
+  \item \textbf{Python 3.10} (exigido pelo PyCaret 3.3.2);
+  \item \textbf{Java 21} (JDK). O Maven não precisa ser instalado: o projeto usa o Maven Wrapper;
+  \item \textbf{Node.js 20} ou superior;
+  \item Opcional: chave gratuita da API do Gemini (\url{https://aistudio.google.com/apikey}), necessária apenas para a justificativa textual e o assistente conversacional.
+\end{itemize}
+
+Não é necessário instalar banco de dados: as instruções abaixo usam o perfil \texttt{dev}, com banco H2 em memória.
+
+\section{Passo a passo}
+
+São necessários três terminais, um para cada serviço. Os comandos abaixo são para Windows (PowerShell). No Linux ou macOS, troque \texttt{.\textbackslash.venv\textbackslash Scripts\textbackslash python.exe} por \texttt{.venv/bin/python} e \texttt{.\textbackslash mvnw} por \texttt{./mvnw}.
+
+\subsection*{1. Clonar o repositório}
+\begin{lstlisting}
+git clone https://github.com/Edurequia/tcc-sistema-recomendacao-equipes.git
+cd tcc-sistema-recomendacao-equipes
+\end{lstlisting}
+
+\subsection*{2. Motor de predição (terminal 1)}
+O modelo treinado (\texttt{motor\_predicao\_tcc.pkl}) já está na pasta.
+\begin{lstlisting}
+cd api_motor_predicao
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
+\end{lstlisting}
+Verificação: \url{http://localhost:8000/health} deve responder \texttt{"modeloCarregado": true}.
+
+\subsection*{3. Backend (terminal 2)}
+\begin{lstlisting}
+cd backend
+.\mvnw spring-boot:run "-Dspring-boot.run.profiles=dev"
+\end{lstlisting}
+A primeira execução baixa as dependências e leva alguns minutos. Verificação: \url{http://localhost:8080/actuator/health} deve responder \texttt{UP}. A documentação da API fica em \url{http://localhost:8080/swagger-ui.html}.
+
+\paragraph{Opcional: ativar o Gemini.} Antes de iniciar o backend, crie o arquivo \texttt{backend/.env} com:
+\begin{lstlisting}
+SPRING_AI_MODEL_CHAT=google-genai
+GEMINI_API_KEY=sua-chave-aqui
+\end{lstlisting}
+Sem a chave, o sistema funciona normalmente; apenas a justificativa e o assistente informam que o serviço não está configurado.
+
+\subsection*{4. Dados de exemplo (terminal 3)}
+O banco começa apenas com o catálogo de tecnologias. Para cadastrar desenvolvedores e projetos fictícios:
+\begin{lstlisting}
+cd avaliacao
+python popular_base.py
+\end{lstlisting}
+O script usa apenas a biblioteca padrão do Python.
+
+\subsection*{5. Frontend (terminal 3)}
+\begin{lstlisting}
+cd ../frontend
+npm install
+npm run dev
+\end{lstlisting}
+Abra \url{http://localhost:5173} no navegador.
+
+\section{Roteiro sugerido de teste}
+
+\begin{enumerate}[noitemsep]
+  \item Em \textbf{Projetos}, abra um projeto cadastrado e gere a recomendação;
+  \item Observe o ranking dos candidatos, a equipe proposta, as métricas da equipe e a comparação com a linha de base aleatória;
+  \item Confirme a equipe: as horas dos integrantes passam a ser descontadas nos próximos projetos;
+  \item Com o Gemini ativo, gere a justificativa da equipe ou descreva um projeto em linguagem natural no \textbf{Assistente}.
+\end{enumerate}
+
+\section{Reproduzir os cenários de avaliação}
+
+Os resultados das quatro situações controladas apresentadas no texto podem ser regenerados. Com o motor de predição no ar e o backend \textbf{recém-iniciado} no perfil \texttt{dev} (base vazia, sem executar o passo 4):
+\begin{lstlisting}
+cd avaliacao
+python cenarios.py
+\end{lstlisting}
+As tabelas são gravadas em \texttt{avaliacao/resultados/}. Para repetir, reinicie o backend, o que zera a base.
+
+\section{Problemas comuns}
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Erro 503 ao gerar recomendação:} o motor de predição (passo 2) não está em execução;
+  \item \textbf{``Não foi possível contatar o servidor'' no frontend:} o backend (passo 3) não está em execução;
+  \item \textbf{Falha na instalação do PyCaret:} confira se o Python é a versão 3.10;
+  \item \textbf{Não atualize o LightGBM:} a versão 4.7.0 encerra o processo ao prever com o modelo; o \texttt{requirements.txt} fixa a 4.6.0.
+\end{itemize}
+
+\end{document}

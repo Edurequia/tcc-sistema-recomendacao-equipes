@@ -116,6 +116,9 @@ class ConversaHistoricoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("RECOMENDACAO"))
                 .andExpect(jsonPath("$.resposta", containsString("Portal do Aluno")))
+                // a justificativa ja acompanha a recomendacao; nao ha o que pedir
+                .andExpect(jsonPath("$.resposta",
+                        org.hamcrest.Matchers.not(containsString("peca a justificativa"))))
                 .andExpect(jsonPath("$.faltantes").isEmpty())
                 .andExpect(jsonPath("$.recomendacao.origem").value("CHAT"))
                 .andExpect(jsonPath("$.recomendacao.integrantesSelecionados").value(2));

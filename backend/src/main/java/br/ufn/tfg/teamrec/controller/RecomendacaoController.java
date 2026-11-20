@@ -48,8 +48,10 @@ public class RecomendacaoController {
 
     @PostMapping("/projetos/{projetoId}/recomendacoes")
     @Operation(summary = "Gera uma recomendacao para o projeto",
-            description = "Pontua todos os desenvolvedores ativos no motor de predicao e grava o "
-                    + "ranking completo. Responde 503 se o motor estiver indisponivel.")
+            description = "Pontua todos os desenvolvedores ativos no motor de predicao, grava o "
+                    + "ranking completo e devolve a recomendacao ja com a justificativa do modelo de "
+                    + "linguagem. Se o modelo falhar, a recomendacao e devolvida sem o texto e com o "
+                    + "motivo em avisoJustificativa. Responde 503 se o motor estiver indisponivel.")
     public ResponseEntity<RecomendacaoResponse> gerar(@PathVariable Long projetoId,
                                                       UriComponentsBuilder uriBuilder) {
         RecomendacaoResponse gerada = service.gerar(projetoId);
@@ -110,9 +112,11 @@ public class RecomendacaoController {
     }
 
     @PostMapping("/recomendacoes/{id}/justificativa")
-    @Operation(summary = "Pede ao modelo de linguagem a explicacao da equipe recomendada",
-            description = "Envia ao modelo o ranking, as metricas e as restricoes ja gravados e "
-                    + "guarda o texto na recomendacao. O texto ja existente e reaproveitado; use "
+    @Operation(summary = "Gera de novo, ou completa, a explicacao da equipe recomendada",
+            description = "A geracao da recomendacao ja pede a justificativa; este endpoint serve "
+                    + "para repetir quando o modelo falhou ou para pedir um novo texto. Envia ao "
+                    + "modelo o ranking, as metricas e as restricoes ja gravados e guarda o texto "
+                    + "na recomendacao. O texto ja existente e reaproveitado; use "
                     + "regerar=true para produzir um novo. Responde 503 quando a integracao nao "
                     + "esta configurada ou o modelo esta indisponivel.")
     public JustificativaResponse justificar(

@@ -44,8 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Justificativa da equipe com o motor e o modelo de linguagem substituidos por
- * dubles: verifica a orquestracao, o reaproveitamento do texto ja gravado e a
- * traducao da indisponibilidade em 503.
+ * dubles: verifica que a recomendacao ja nasce justificada, que a falha do
+ * modelo nao impede a recomendacao, o reaproveitamento do texto ja gravado e a
+ * traducao da indisponibilidade em 503 no endpoint de (re)geracao.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -68,11 +69,53 @@ class JustificativaControllerTest {
     private GeradorJustificativa gerador;
 
     @Test
-    @DisplayName("gera o texto, grava na recomendacao e devolve o modelo usado")
-    void deveGerarEGravar() throws Exception {
-        long recomendacaoId = recomendacao();
+    @DisplayName("a recomendacao ja volta com a justificativa gerada e gravada")
+    void recomendacaoJaVemJustificada() throws Exception {
         when(gerador.gerar(any())).thenReturn(
                 new Justificativa("A equipe cobre os dois papeis exigidos.", "gemini-2.5-flash"));
+
+        String corpo = mvc.perform(post("/api/projetos/{id}/recomendacoes", projeto().getId()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.justificativaLlm").value("A equipe cobre os dois papeis exigidos."))
+                .andExpect(jsonPath("$.avisoJustificativa").doesNotExist())
+                .andReturn().getResponse().getContentAsString();
+        long recomendacaoId = ((Number) JsonPath.read(corpo, "$.id")).longValue();
+
+        mvc.perform(get("/api/recomendacoes/{id}", recomendacaoId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.justificativaLlm")
+                        .value("A equipe cobre os dois papeis exigidos."));
+        verify(gerador, times(1)).gerar(any());
+    }
+
+    @Test
+    @DisplayName("modelo indisponivel nao impede a recomendacao: ela volta sem texto e com o aviso")
+    void modeloIndisponivelNaoImpedeRecomendacao() throws Exception {
+        when(gerador.gerar(any())).thenThrow(new ServicoExternoException(
+                "gemini", "O modelo de linguagem esta indisponivel no momento.", null));
+
+        String corpo = mvc.perform(post("/api/projetos/{id}/recomendacoes", projeto().getId()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.ranking.length()").value(2))
+                .andExpect(jsonPath("$.integrantesSelecionados").value(1))
+                .andExpect(jsonPath("$.justificativaLlm").doesNotExist())
+                .andExpect(jsonPath("$.avisoJustificativa")
+                        .value("O modelo de linguagem esta indisponivel no momento."))
+                .andReturn().getResponse().getContentAsString();
+        long recomendacaoId = ((Number) JsonPath.read(corpo, "$.id")).longValue();
+
+        mvc.perform(get("/api/recomendacoes/{id}", recomendacaoId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.justificativaLlm").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("o endpoint gera o texto quando a recomendacao ficou sem justificativa")
+    void endpointCompletaRecomendacaoSemTexto() throws Exception {
+        when(gerador.gerar(any()))
+                .thenThrow(new ServicoExternoException("gemini", "Indisponivel.", null))
+                .thenReturn(new Justificativa("A equipe cobre os dois papeis exigidos.", "gemini-2.5-flash"));
+        long recomendacaoId = recomendacao();
 
         mvc.perform(post("/api/recomendacoes/{id}/justificativa", recomendacaoId))
                 .andExpect(status().isOk())
@@ -90,11 +133,8 @@ class JustificativaControllerTest {
     @Test
     @DisplayName("envia ao modelo a equipe, os preteridos e as metricas gravadas")
     void deveMontarOContexto() throws Exception {
-        long recomendacaoId = recomendacao();
         when(gerador.gerar(any())).thenReturn(new Justificativa("ok", "gemini-2.5-flash"));
-
-        mvc.perform(post("/api/recomendacoes/{id}/justificativa", recomendacaoId))
-                .andExpect(status().isOk());
+        recomendacao();
 
         ArgumentCaptor<ContextoJustificativa> capturado =
                 ArgumentCaptor.forClass(ContextoJustificativa.class);
@@ -114,11 +154,9 @@ class JustificativaControllerTest {
     @Test
     @DisplayName("reaproveita a justificativa ja gravada em vez de consultar o modelo de novo")
     void deveReaproveitarTextoGravado() throws Exception {
-        long recomendacaoId = recomendacao();
         when(gerador.gerar(any())).thenReturn(new Justificativa("Primeira versao.", "gemini-2.5-flash"));
+        long recomendacaoId = recomendacao();
 
-        mvc.perform(post("/api/recomendacoes/{id}/justificativa", recomendacaoId))
-                .andExpect(status().isOk());
         mvc.perform(post("/api/recomendacoes/{id}/justificativa", recomendacaoId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.justificativa").value("Primeira versao."))
@@ -130,13 +168,11 @@ class JustificativaControllerTest {
     @Test
     @DisplayName("regerar=true consulta o modelo novamente e substitui o texto")
     void deveRegerarQuandoPedido() throws Exception {
-        long recomendacaoId = recomendacao();
         when(gerador.gerar(any()))
                 .thenReturn(new Justificativa("Primeira versao.", "gemini-2.5-flash"))
                 .thenReturn(new Justificativa("Segunda versao.", "gemini-2.5-flash"));
+        long recomendacaoId = recomendacao();
 
-        mvc.perform(post("/api/recomendacoes/{id}/justificativa", recomendacaoId))
-                .andExpect(status().isOk());
         mvc.perform(post("/api/recomendacoes/{id}/justificativa?regerar=true", recomendacaoId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.justificativa").value("Segunda versao."))
@@ -156,11 +192,11 @@ class JustificativaControllerTest {
     }
 
     @Test
-    @DisplayName("modelo indisponivel vira 503 e nada e gravado")
+    @DisplayName("no endpoint, modelo indisponivel vira 503 e nada e gravado")
     void deveResponder503() throws Exception {
-        long recomendacaoId = recomendacao();
         when(gerador.gerar(any())).thenThrow(new ServicoExternoException(
                 "gemini", "A integracao com o modelo de linguagem nao esta configurada.", null));
+        long recomendacaoId = recomendacao();
 
         mvc.perform(post("/api/recomendacoes/{id}/justificativa", recomendacaoId))
                 .andExpect(status().isServiceUnavailable())
@@ -174,7 +210,16 @@ class JustificativaControllerTest {
     // Cenario minimo: um projeto, dois candidatos, um selecionado.
     // ------------------------------------------------------------------
 
+    /** O gerador deve estar configurado antes: a geracao ja consulta o modelo. */
     private long recomendacao() throws Exception {
+        String corpo = mvc.perform(post("/api/projetos/{id}/recomendacoes", projeto().getId()))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        return ((Number) JsonPath.read(corpo, "$.id")).longValue();
+    }
+
+    private Projeto projeto() {
         Projeto projeto = new Projeto("Portal Academico", "Projeto de teste",
                 CriticidadeProjeto.ALTA, 1, 20);
         projeto.adicionarPapelRequerido(PapelAtuacao.BACKEND, 1);
@@ -189,11 +234,7 @@ class JustificativaControllerTest {
                 "LGBMRegressor",
                 List.of(new Predicao(ana.getId(), 90.0), new Predicao(bruno.getId(), 40.0))));
 
-        String corpo = mvc.perform(post("/api/projetos/{id}/recomendacoes", projeto.getId()))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-
-        return ((Number) JsonPath.read(corpo, "$.id")).longValue();
+        return projeto;
     }
 
     private Desenvolvedor desenvolvedor(String nome, String email, Senioridade senioridade, PapelAtuacao papel) {

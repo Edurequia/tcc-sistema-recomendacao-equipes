@@ -77,15 +77,25 @@ describe('pagina da recomendacao', async () => {
     await waitFor(() => expect(urls.at(-1)!.searchParams.get('sorteios')).toBe('500'))
   })
 
-  it('pede a justificativa ao modelo de linguagem', async () => {
-    recomendacao({ justificativaLlm: undefined })
+  it('mostra a justificativa que ja veio com a recomendacao, sem precisar pedir', async () => {
+    recomendacao({ justificativaLlm: 'A equipe cobre os papeis principais.\n\nAna lidera o backend.' })
+    await renderizarRota('/recomendacoes/7')
+
+    const painel = await screen.findByRole('region', { name: 'Justificativa' })
+    expect(within(painel).getByText('A equipe cobre os papeis principais.')).toBeInTheDocument()
+    expect(within(painel).getByText('Ana lidera o backend.')).toBeInTheDocument()
+    expect(within(painel).queryByRole('button', { name: 'Gerar justificativa' })).not.toBeInTheDocument()
+  })
+
+  it('sem justificativa, mostra o motivo e permite tentar novamente', async () => {
+    recomendacao({ justificativaLlm: undefined, avisoJustificativa: 'O modelo de linguagem esta indisponivel no momento.' })
     let regerar: string | null = 'nao pedido'
     servidor.use(
       http.post('/api/recomendacoes/7/justificativa', ({ request }) => {
         regerar = new URL(request.url).searchParams.get('regerar')
         return HttpResponse.json({
           recomendacaoId: 7,
-          justificativa: 'A equipe cobre os papeis principais.\n\nAna lidera o backend.',
+          justificativa: 'A equipe cobre os papeis principais.',
           modelo: 'gemini-2.5-flash',
           geradaAgora: true,
         })
@@ -94,10 +104,10 @@ describe('pagina da recomendacao', async () => {
     const { usuario } = await renderizarRota('/recomendacoes/7')
 
     const painel = await screen.findByRole('region', { name: 'Justificativa' })
-    await usuario.click(within(painel).getByRole('button', { name: 'Gerar justificativa' }))
+    expect(within(painel).getByText(/indisponivel no momento/)).toBeInTheDocument()
+    await usuario.click(within(painel).getByRole('button', { name: 'Tentar novamente' }))
 
     expect(await within(painel).findByText('A equipe cobre os papeis principais.')).toBeInTheDocument()
-    expect(within(painel).getByText('Ana lidera o backend.')).toBeInTheDocument()
     expect(within(painel).getByText(/gemini-2.5-flash/)).toBeInTheDocument()
     expect(regerar).toBe('false')
   })
@@ -121,7 +131,7 @@ describe('pagina da recomendacao', async () => {
     expect(regerar).toBe('true')
   })
 
-  it('explica quando o modelo de linguagem nao esta configurado', async () => {
+  it('recomendacao sem justificativa e sem motivo gravado oferece tentar novamente', async () => {
     recomendacao({ justificativaLlm: undefined })
     servidor.use(
       http.post('/api/recomendacoes/7/justificativa', () =>
@@ -134,7 +144,8 @@ describe('pagina da recomendacao', async () => {
     const { usuario } = await renderizarRota('/recomendacoes/7')
 
     const painel = await screen.findByRole('region', { name: 'Justificativa' })
-    await usuario.click(within(painel).getByRole('button', { name: 'Gerar justificativa' }))
+    expect(within(painel).getByText(/não foi gerada/)).toBeInTheDocument()
+    await usuario.click(within(painel).getByRole('button', { name: 'Tentar novamente' }))
 
     expect(await within(painel).findByText(/Defina GEMINI_API_KEY/)).toBeInTheDocument()
   })

@@ -1,0 +1,788 @@
+{
+  "cenario": 4,
+  "titulo": "Conflito de alocacao entre projetos simultaneos",
+  "totalBase": 12,
+  "projetoA": {
+    "id": 4,
+    "nome": "Portal do Paciente",
+    "descricao": "Projeto A do cenario de conflito: equipe formada e confirmada primeiro.",
+    "criticidade": "ALTA",
+    "criticidadeDescricao": "Projeto complexo e de alto risco: senioridade e soft skills recebem multiplicadores de peso elevados.",
+    "criticidadeNivel": 3,
+    "status": "PLANEJAMENTO",
+    "statusDescricao": "Em planejamento",
+    "tamanhoEquipe": 4,
+    "horasSemanaisPorIntegrante": 20,
+    "dataInicioPrevista": "2026-10-01",
+    "dataFimPrevista": "2027-03-31",
+    "vagasDeclaradas": 3,
+    "vagasSemPapelFixo": 1,
+    "papeisRequeridos": [
+      {
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "quantidade": 2
+      },
+      {
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "quantidade": 1
+      }
+    ],
+    "habilidadesRequeridas": [
+      {
+        "habilidadeId": 5,
+        "nome": "Java",
+        "categoria": "LINGUAGEM",
+        "obrigatoria": true,
+        "peso": 5,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 17,
+        "nome": "Spring Boot",
+        "categoria": "FRAMEWORK",
+        "obrigatoria": true,
+        "peso": 4,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 16,
+        "nome": "React",
+        "categoria": "FRAMEWORK",
+        "obrigatoria": true,
+        "peso": 4,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 22,
+        "nome": "PostgreSQL",
+        "categoria": "BANCO_DE_DADOS",
+        "obrigatoria": false,
+        "peso": 3,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 27,
+        "nome": "Docker",
+        "categoria": "DEVOPS",
+        "obrigatoria": false,
+        "peso": 3,
+        "usadaNoModelo": true
+      }
+    ]
+  },
+  "projetoB": {
+    "id": 5,
+    "nome": "Aplicativo de Agendamento",
+    "descricao": "Projeto B do cenario de conflito: disputa os mesmos profissionais.",
+    "criticidade": "MEDIA",
+    "criticidadeDescricao": "Balanceamento padrao entre habilidades tecnicas e perfil comportamental.",
+    "criticidadeNivel": 2,
+    "status": "PLANEJAMENTO",
+    "statusDescricao": "Em planejamento",
+    "tamanhoEquipe": 4,
+    "horasSemanaisPorIntegrante": 20,
+    "dataInicioPrevista": "2026-11-01",
+    "dataFimPrevista": "2027-04-30",
+    "vagasDeclaradas": 3,
+    "vagasSemPapelFixo": 1,
+    "papeisRequeridos": [
+      {
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "quantidade": 2
+      },
+      {
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "quantidade": 1
+      }
+    ],
+    "habilidadesRequeridas": [
+      {
+        "habilidadeId": 5,
+        "nome": "Java",
+        "categoria": "LINGUAGEM",
+        "obrigatoria": true,
+        "peso": 5,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 17,
+        "nome": "Spring Boot",
+        "categoria": "FRAMEWORK",
+        "obrigatoria": true,
+        "peso": 4,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 16,
+        "nome": "React",
+        "categoria": "FRAMEWORK",
+        "obrigatoria": true,
+        "peso": 4,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 22,
+        "nome": "PostgreSQL",
+        "categoria": "BANCO_DE_DADOS",
+        "obrigatoria": false,
+        "peso": 3,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 27,
+        "nome": "Docker",
+        "categoria": "DEVOPS",
+        "obrigatoria": false,
+        "peso": 3,
+        "usadaNoModelo": true
+      }
+    ]
+  },
+  "recomendacaoA": {
+    "id": 4,
+    "projetoId": 4,
+    "projetoNome": "Portal do Paciente",
+    "origem": "FORMULARIO",
+    "origemDescricao": "Via de fluxo estruturado (formularios)",
+    "criadoEm": "2026-09-20T20:54:41.6483496-03:00",
+    "tamanhoEquipe": 4,
+    "totalCandidatos": 12,
+    "integrantesSelecionados": 4,
+    "metricas": {
+      "coberturaPapeis": 100.0,
+      "coberturaTecnologias": 100.0,
+      "desvioPadraoSenioridade": 0.0,
+      "desvioPadraoScore": 4.603,
+      "scoreMedioEquipe": 85.952
+    },
+    "ranking": [
+      {
+        "posicao": 1,
+        "desenvolvedorId": 63,
+        "nome": "Julia Krause",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 90.798,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 2,
+        "desenvolvedorId": 55,
+        "nome": "Aurora Bilac",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 88.058,
+        "aderenciaTecnica": 0.7895,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 3,
+        "desenvolvedorId": 56,
+        "nome": "Caio Drummond",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 86.518,
+        "aderenciaTecnica": 0.7895,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 4,
+        "desenvolvedorId": 60,
+        "nome": "Gustavo Holanda",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 78.434,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 5,
+        "desenvolvedorId": 64,
+        "nome": "Kleber Lisboa",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 76.286,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 6,
+        "desenvolvedorId": 57,
+        "nome": "Dalva Eiras",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 69.653,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 7,
+        "desenvolvedorId": 58,
+        "nome": "Elio Freyre",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 69.207,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 8,
+        "desenvolvedorId": 61,
+        "nome": "Helena Iglesias",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 63.568,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 9,
+        "desenvolvedorId": 59,
+        "nome": "Fatima Guedes",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 53.008,
+        "aderenciaTecnica": 0.4737,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 10,
+        "desenvolvedorId": 62,
+        "nome": "Ivo Jobim",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 48.794,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 11,
+        "desenvolvedorId": 65,
+        "nome": "Laura Menezes",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "scoreAfinidade": 47.438,
+        "aderenciaTecnica": 0.4211,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 12,
+        "desenvolvedorId": 66,
+        "nome": "Murilo Nobre",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "scoreAfinidade": 34.134,
+        "aderenciaTecnica": 0.4211,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      }
+    ]
+  },
+  "recomendacaoBAntes": {
+    "id": 5,
+    "projetoId": 5,
+    "projetoNome": "Aplicativo de Agendamento",
+    "origem": "FORMULARIO",
+    "origemDescricao": "Via de fluxo estruturado (formularios)",
+    "criadoEm": "2026-09-20T20:54:41.680413-03:00",
+    "tamanhoEquipe": 4,
+    "totalCandidatos": 12,
+    "integrantesSelecionados": 4,
+    "metricas": {
+      "coberturaPapeis": 100.0,
+      "coberturaTecnologias": 100.0,
+      "desvioPadraoSenioridade": 0.0,
+      "desvioPadraoScore": 6.997,
+      "scoreMedioEquipe": 82.803
+    },
+    "ranking": [
+      {
+        "posicao": 1,
+        "desenvolvedorId": 63,
+        "nome": "Julia Krause",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 88.028,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 2,
+        "desenvolvedorId": 55,
+        "nome": "Aurora Bilac",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 86.674,
+        "aderenciaTecnica": 0.7895,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 3,
+        "desenvolvedorId": 56,
+        "nome": "Caio Drummond",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 85.745,
+        "aderenciaTecnica": 0.7895,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 4,
+        "desenvolvedorId": 64,
+        "nome": "Kleber Lisboa",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 76.32,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 5,
+        "desenvolvedorId": 60,
+        "nome": "Gustavo Holanda",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 70.765,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 6,
+        "desenvolvedorId": 57,
+        "nome": "Dalva Eiras",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 69.542,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 7,
+        "desenvolvedorId": 58,
+        "nome": "Elio Freyre",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 68.994,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 8,
+        "desenvolvedorId": 61,
+        "nome": "Helena Iglesias",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 59.216,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 9,
+        "desenvolvedorId": 59,
+        "nome": "Fatima Guedes",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 53.737,
+        "aderenciaTecnica": 0.4737,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 10,
+        "desenvolvedorId": 62,
+        "nome": "Ivo Jobim",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 46.805,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 11,
+        "desenvolvedorId": 65,
+        "nome": "Laura Menezes",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "scoreAfinidade": 45.74,
+        "aderenciaTecnica": 0.4211,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 12,
+        "desenvolvedorId": 66,
+        "nome": "Murilo Nobre",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "scoreAfinidade": 34.732,
+        "aderenciaTecnica": 0.4211,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      }
+    ]
+  },
+  "recomendacaoBDepois": {
+    "id": 6,
+    "projetoId": 5,
+    "projetoNome": "Aplicativo de Agendamento",
+    "origem": "FORMULARIO",
+    "origemDescricao": "Via de fluxo estruturado (formularios)",
+    "criadoEm": "2026-09-20T20:54:41.7420757-03:00",
+    "tamanhoEquipe": 4,
+    "totalCandidatos": 12,
+    "integrantesSelecionados": 4,
+    "metricas": {
+      "coberturaPapeis": 100.0,
+      "coberturaTecnologias": 84.21,
+      "desvioPadraoSenioridade": 0.0,
+      "desvioPadraoScore": 6.097,
+      "scoreMedioEquipe": 68.518
+    },
+    "ranking": [
+      {
+        "posicao": 1,
+        "desenvolvedorId": 63,
+        "nome": "Julia Krause",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 79.558,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 0.5,
+        "elegivel": false,
+        "selecionado": false
+      },
+      {
+        "posicao": 2,
+        "desenvolvedorId": 55,
+        "nome": "Aurora Bilac",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 78.956,
+        "aderenciaTecnica": 0.7895,
+        "coberturaHoras": 0.5,
+        "elegivel": false,
+        "selecionado": false
+      },
+      {
+        "posicao": 3,
+        "desenvolvedorId": 56,
+        "nome": "Caio Drummond",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 77.917,
+        "aderenciaTecnica": 0.7895,
+        "coberturaHoras": 0.5,
+        "elegivel": false,
+        "selecionado": false
+      },
+      {
+        "posicao": 4,
+        "desenvolvedorId": 64,
+        "nome": "Kleber Lisboa",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 76.32,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 5,
+        "desenvolvedorId": 57,
+        "nome": "Dalva Eiras",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 69.542,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 6,
+        "desenvolvedorId": 58,
+        "nome": "Elio Freyre",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 68.994,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 7,
+        "desenvolvedorId": 60,
+        "nome": "Gustavo Holanda",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 62.384,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 0.5,
+        "elegivel": false,
+        "selecionado": false
+      },
+      {
+        "posicao": 8,
+        "desenvolvedorId": 61,
+        "nome": "Helena Iglesias",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 59.216,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 9,
+        "desenvolvedorId": 59,
+        "nome": "Fatima Guedes",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 53.737,
+        "aderenciaTecnica": 0.4737,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 10,
+        "desenvolvedorId": 62,
+        "nome": "Ivo Jobim",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 46.805,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 11,
+        "desenvolvedorId": 65,
+        "nome": "Laura Menezes",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "scoreAfinidade": 45.74,
+        "aderenciaTecnica": 0.4211,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 12,
+        "desenvolvedorId": 66,
+        "nome": "Murilo Nobre",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "scoreAfinidade": 34.732,
+        "aderenciaTecnica": 0.4211,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      }
+    ]
+  },
+  "sobreposicaoAntes": [
+    "Aurora Bilac",
+    "Caio Drummond",
+    "Gustavo Holanda",
+    "Julia Krause"
+  ],
+  "sobreposicaoDepois": [],
+  "alocacaoManual": {
+    "status": 422,
+    "corpo": {
+      "timestamp": "2026-09-20T20:54:41.7596791-03:00",
+      "status": 422,
+      "erro": "Regra de negocio violada",
+      "mensagem": "Conflito de alocacao: 'Aurora Bilac' tem 10 horas semanais livres, mas a alocacao exige 20.",
+      "caminho": "/api/projetos/5/alocacoes"
+    }
+  },
+  "linhaBaseA": {
+    "recomendacaoId": 4,
+    "projetoId": 4,
+    "sorteios": 100,
+    "semente": 42,
+    "candidatosElegiveis": 12,
+    "tamanhoEquipeSorteada": 4,
+    "prototipo": {
+      "coberturaPapeis": 100.0,
+      "coberturaTecnologias": 100.0,
+      "desvioPadraoSenioridade": 0.0,
+      "desvioPadraoScore": 4.603,
+      "scoreMedioEquipe": 85.952
+    },
+    "linhaBase": {
+      "media": {
+        "coberturaPapeis": 72.33,
+        "coberturaTecnologias": 89.47,
+        "desvioPadraoSenioridade": 0.646,
+        "desvioPadraoScore": 14.96,
+        "scoreMedioEquipe": 66.958
+      },
+      "desvioPadrao": {
+        "coberturaPapeis": 22.14,
+        "coberturaTecnologias": 12.41,
+        "desvioPadraoSenioridade": 0.184,
+        "desvioPadraoScore": 4.209,
+        "scoreMedioEquipe": 7.504
+      }
+    }
+  },
+  "linhaBaseBDepois": {
+    "recomendacaoId": 6,
+    "projetoId": 5,
+    "sorteios": 100,
+    "semente": 42,
+    "candidatosElegiveis": 8,
+    "tamanhoEquipeSorteada": 4,
+    "prototipo": {
+      "coberturaPapeis": 100.0,
+      "coberturaTecnologias": 84.21,
+      "desvioPadraoSenioridade": 0.0,
+      "desvioPadraoScore": 6.097,
+      "scoreMedioEquipe": 68.518
+    },
+    "linhaBase": {
+      "media": {
+        "coberturaPapeis": 71.0,
+        "coberturaTecnologias": 81.26,
+        "desvioPadraoSenioridade": 0.415,
+        "desvioPadraoScore": 11.7,
+        "scoreMedioEquipe": 56.308
+      },
+      "desvioPadrao": {
+        "coberturaPapeis": 20.9,
+        "coberturaTecnologias": 7.3,
+        "desvioPadraoSenioridade": 0.149,
+        "desvioPadraoScore": 2.957,
+        "scoreMedioEquipe": 5.353
+      }
+    }
+  }
+}

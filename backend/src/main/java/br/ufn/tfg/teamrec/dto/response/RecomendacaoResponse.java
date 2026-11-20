@@ -16,6 +16,9 @@ import java.util.List;
  * @param observacaoRestricao o que nao pode ser atendido (equipe parcial, vaga
  *                            sem o papel exigido, tecnologia obrigatoria ausente).
  *                            Omitido quando todos os requisitos foram cumpridos.
+ * @param avisoJustificativa  por que a justificativa nao acompanha a recomendacao
+ *                            (modelo de linguagem desligado ou indisponivel).
+ *                            So aparece na resposta da geracao; nao e gravado.
  */
 @Schema(description = "Recomendacao com equipe proposta, metricas e ranking completo.")
 public record RecomendacaoResponse(
@@ -31,6 +34,7 @@ public record RecomendacaoResponse(
         MetricasEquipeResponse metricas,
         String observacaoRestricao,
         String justificativaLlm,
+        String avisoJustificativa,
         List<MembroRankingResponse> ranking
 ) {
 }

@@ -23,6 +23,7 @@ public interface RecomendacaoMapper {
     @Mapping(target = "integrantesSelecionados", expression = "java(recomendacao.getMembrosSelecionados().size())")
     @Mapping(target = "metricas", source = ".")
     @Mapping(target = "ranking", source = "membros")
+    @Mapping(target = "avisoJustificativa", ignore = true)
     RecomendacaoResponse toResponse(Recomendacao recomendacao);
 
     MetricasEquipeResponse toMetricas(Recomendacao recomendacao);

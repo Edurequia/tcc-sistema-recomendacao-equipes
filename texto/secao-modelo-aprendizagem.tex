@@ -1,3 +1,4 @@
+\subsubsection{Desenvolvimento do motor preditivo}
 Para o desenvolvimento do motor preditivo responsável por sugerir a formação das equipes, adotou-se uma abordagem fundamentada em técnicas de Aprendizado de Máquina. A base de dados primária foi extraída dos resultados públicos da Stack Overflow Developer Survey 2024.
 
 O processamento analítico inicial consistiu na filtragem dos dados, selecionando profissionais cujas áreas de atuação fossem aderentes ao escopo de projetos de software, tais como \textit{backend}, \textit{frontend}, \textit{full-stack}, \textit{mobile}, garantia de qualidade (QA) e operações (DevOps). Após a filtragem por área de atuação, o conjunto de dados resultante reuniu 33.462 registros de profissionais.
@@ -6,27 +7,28 @@ Em seguida, foram aplicadas técnicas para transformar os dados qualitativos bru
 
 No entanto, a base pública não contemplava informações sobre competências comportamentais (\textit{soft skills}) e disponibilidade de carga horária. Para viabilizar a análise desses atributos, aplicou-se a injeção de dados sintéticos. Para que esses dados fossem plausíveis, os valores foram gerados com base no modelo estatístico de curva normal, em uma escala de 0 a 5 para as competências comportamentais e de 0 a 60 horas semanais para a disponibilidade. Essa abordagem garantiu que a maioria dos profissionais recebesse notas e cargas horárias próximas a uma média realista, com uma incidência menor de casos extremos, simulando a distribuição de perfis em um ambiente corporativo. No caso da carga horária, a geração contemplou também profissionais com pouca ou nenhuma disponibilidade, de modo que o algoritmo pudesse aprender o impacto da falta de tempo sobre a alocação.
 
-Como os algoritmos de aprendizagem supervisionada demandam dados históricos para o treinamento, realizou-se uma simulação cruzando os perfis dos desenvolvedores com cenários de projetos fictícios. Cada cenário recebeu um tipo de demanda (\textit{backend}, \textit{frontend} ou ambos), uma carga horária semanal exigida de cada integrante e uma lista de tecnologias requeridas, sorteadas de acordo com a popularidade de cada tecnologia na pesquisa, cada uma acompanhada de um peso de importância de 1 a 5. Esses cenários também foram classificados de acordo com a sua complexidade, cujos níveis de criticidade foram definidos da seguinte forma:
+Como os algoritmos de aprendizagem supervisionada demandam dados históricos para o treinamento, realizou-se uma simulação cruzando os perfis dos desenvolvedores com cenários de projetos fictícios. Cada cenário recebeu um tipo de demanda (\textit{backend}, \textit{frontend} ou ambos), uma carga horária semanal exigida de cada integrante e uma lista de tecnologias requeridas, sorteadas de acordo com a popularidade de cada tecnologia na pesquisa, cada uma acompanhada de um peso de importância de 1 a 5. Os cenários também foram classificados em três níveis de criticidade, de acordo com a sua complexidade.
 
 \begin{itemize}
-    \item \textbf{Criticidade Baixa (Nível 1):} Projetos com foco no atendimento das competências técnicas (\textit{hard skills}) e papéis exigidos.
-    \item \textbf{Criticidade Média (Nível 2):} Projetos intermediários, que exigem um balanceamento padrão entre as habilidades técnicas e o perfil comportamental.
-    \item \textbf{Criticidade Alta (Nível 3):} Projetos complexos e de alto risco, nos quais o nível de experiência (senioridade) e as competências comportamentais (\textit{soft skills}) recebem multiplicadores de peso mais elevados para garantir a estabilidade da entrega.
+    \item \textbf{Criticidade Baixa (Nível 1).} Projetos com foco no atendimento das competências técnicas (\textit{hard skills}) e papéis exigidos.
+    \item \textbf{Criticidade Média (Nível 2).} Projetos intermediários, que exigem um balanceamento padrão entre as habilidades técnicas e o perfil comportamental.
+    \item \textbf{Criticidade Alta (Nível 3).} Projetos complexos e de alto risco, nos quais o nível de experiência (senioridade) e as competências comportamentais (\textit{soft skills}) recebem multiplicadores de peso mais elevados para garantir a estabilidade da entrega.
 \end{itemize}
 
 Para viabilizar o treinamento, foi definida uma variável alvo, denominada \textit{escore de afinidade}. Como a base de dados pública não possuía um histórico real de sucesso de alocações, esse escore precisou ser calculado de forma sintética para cada par de desenvolvedor e projeto.
 
-Como a afinidade depende tanto do desenvolvedor quanto do projeto, duas medidas foram calculadas para cada par. A primeira é a \textit{aderência técnica}, que corresponde à proporção dos pesos das tecnologias exigidas que o profissional domina. A segunda é a \textit{cobertura de horas}, que indica quanto da carga semanal exigida pelo projeto o profissional consegue atender, limitada ao valor máximo de 1. Dessa forma, as trinta colunas de tecnologias extraídas da pesquisa deixam de ser analisadas isoladamente e passam a ser resumidas na aderência técnica, que expressa o quanto o conhecimento do profissional atende à necessidade real do projeto.
+Como a afinidade depende tanto do desenvolvedor quanto do projeto, duas medidas foram calculadas para cada par. A primeira é a \textit{aderência técnica}, que corresponde à proporção dos pesos das tecnologias exigidas que o profissional domina. A segunda é a \textit{cobertura de horas}, que indica quanto da carga semanal exigida pelo projeto o profissional consegue atender, limitada ao valor máximo de 1. Com isso, as trinta colunas de tecnologias extraídas da pesquisa deixam de ser analisadas isoladamente e passam a ser resumidas na aderência técnica, que expressa o quanto o conhecimento do profissional atende à necessidade real do projeto.
 
-A lógica para a geração desse escore baseou-se no alinhamento direto com as regras de negócio: a nota do candidato é calculada a partir de suas características, mas os pesos de cada atributo mudam dependendo da criticidade do projeto. Por exemplo, em um cenário de Criticidade Alta, os multiplicadores da senioridade e das \textit{soft skills} recebem valores maiores, enquanto o peso da aderência técnica diminui. O papel de atuação também é considerado: o profissional cujo papel corresponde exatamente ao exigido recebe a pontuação máxima nesse quesito, enquanto papéis próximos, como um \textit{full-stack} em um projeto exclusivamente de \textit{backend}, recebem uma pontuação parcial. Além disso, para evitar que o algoritmo de aprendizado de máquina apenas decorasse uma regra exata e para simular a imprevisibilidade do fator humano, injetou-se uma margem de ruído estatístico nos resultados.
+O escore foi construído a partir das regras de negócio do sistema. A nota do candidato é calculada com base em suas características, e o peso de cada atributo muda conforme a criticidade do projeto. Em um cenário de criticidade alta, por exemplo, a senioridade e as \textit{soft skills} recebem pesos maiores, enquanto o peso da aderência técnica diminui. O papel de atuação também entra no cálculo. O profissional cujo papel corresponde exatamente ao exigido recebe a pontuação máxima nesse quesito, e papéis próximos, como um \textit{full-stack} em um projeto exclusivamente de \textit{backend}, recebem pontuação parcial. Por fim, foi adicionado um ruído aleatório aos resultados, para que o algoritmo não se limitasse a reproduzir uma regra exata e para representar a imprevisibilidade do fator humano.
 
-Toda essa lógica de pontuação que originou a base de treinamento foi formalizada matematicamente conforme a Equação 1:
+A Equação~\ref{eq:escore} formaliza essa lógica de pontuação.
 
 \begin{equation}
-S(d, p) = w_p \cdot P(d, p) + w_t(c) \cdot T(d, p) + w_s(c) \cdot N(d) + w_c(c) \cdot C(d) + w_h \cdot H(d, p) + \varepsilon
+S = w_p P + w_t(c)\, T + w_s(c)\, N + w_c(c)\, C + w_h H + \varepsilon
+\label{eq:escore}
 \end{equation}
 
-Na qual $S(d, p)$ representa o escore de afinidade do desenvolvedor $d$ em relação ao projeto $p$; $P(d, p)$ a aderência do papel de atuação, que vale 1 para o papel exato, 0,7 para papéis próximos e 0 para os demais; $T(d, p)$ a aderência técnica; $N(d)$ a senioridade normalizada; $C(d)$ as competências comportamentais normalizadas; $H(d, p)$ a cobertura de horas; e $\varepsilon$ o termo de ruído aleatório, com média zero e desvio padrão de 4 pontos. Todos os componentes foram colocados na mesma escala, de 0 a 1, de modo que cada peso ($w$) represente a pontuação máxima que o atributo pode somar. Os pesos variam de acordo com a criticidade ($c$) do cenário e totalizam 100 pontos, conforme a Tabela~\ref{tab:pesos}.
+Nessa equação, $S$ é o escore de afinidade de um desenvolvedor $d$ em relação a um projeto $p$. O termo $P$ é a aderência do papel de atuação, que vale 1 para o papel exato, 0,7 para papéis próximos e 0 para os demais. Os demais termos são a aderência técnica ($T$), a senioridade normalizada ($N$), as competências comportamentais normalizadas ($C$), a cobertura de horas ($H$) e o ruído aleatório ($\varepsilon$), que tem média zero e desvio padrão de 4 pontos. Os termos $P$, $T$ e $H$ dependem do par formado pelo desenvolvedor e pelo projeto, enquanto $N$ e $C$ dependem apenas do desenvolvedor. Todos os componentes foram colocados na mesma escala, de 0 a 1, de modo que cada peso $w$ corresponde à pontuação máxima que o atributo pode somar. Os pesos $w_t$, $w_s$ e $w_c$ variam com a criticidade $c$ do projeto, e em todos os níveis a soma dos pesos é de 100 pontos, conforme a Tabela~\ref{tab:pesos}.
 
 \begin{table}[htbp]
 \centering
@@ -45,12 +47,82 @@ Alta (Nível 3)  & 25 & 15 & 25 & 20 & 15 \\
 }
 \end{table}
 
-Ao final da simulação, cada registro do conjunto de treinamento passou a ser descrito por 13 variáveis de entrada: a senioridade, os seis papéis de atuação, as competências comportamentais, a criticidade do projeto, os requisitos de \textit{backend} e \textit{frontend}, a aderência técnica e a cobertura de horas.
+Ao final da simulação, cada registro do conjunto de treinamento passou a ser descrito por 13 variáveis de entrada, que são a senioridade, os seis papéis de atuação, as competências comportamentais, a criticidade do projeto, os requisitos de \textit{backend} e \textit{frontend}, a aderência técnica e a cobertura de horas.
 
-O treinamento e a avaliação dos modelos preditivos ocorreram em ambiente Python, utilizando a biblioteca PyCaret como ferramenta de \textit{benchmark}. Os dados foram divididos em 80\% para treinamento e 20\% para teste, e cada algoritmo foi avaliado por validação cruzada em 10 partições. A plataforma comparou múltiplos algoritmos de regressão, e o modelo Light Gradient Boosting Machine (LightGBM) foi selecionado por apresentar o menor Erro Quadrático Médio (RMSE). Em seguida, seus hiperparâmetros foram otimizados, alcançando RMSE de \textbf{[PREENCHER]} e Coeficiente de Determinação ($R^2$) de \textbf{[PREENCHER]}\footnote{O RMSE quantifica a magnitude média dos erros preditivos, penalizando desvios acentuados e mantendo a escala original dos dados. O $R^2$ (Coeficiente de Determinação) mede o grau de aprendizado do algoritmo, variando de 0 a 1.}. O procedimento utilizou as bibliotecas PyCaret 3.3.2, scikit-learn 1.4.2 e LightGBM 4.6.0.
+O treinamento foi realizado em Python com a biblioteca PyCaret, que executa o pré-processamento, o treinamento e a comparação de diversos algoritmos sob as mesmas condições. A base foi dividida em 80\% para treinamento e 20\% para teste. Sobre a parte de treinamento, cada algoritmo foi avaliado por validação cruzada em 10 partições. Nesse procedimento, os dados são separados em dez partes, o modelo é treinado com nove delas e testado na restante, e o processo se repete até que todas tenham sido usadas uma vez como teste. Os valores reportados correspondem à média das dez rodadas. Foram utilizadas as bibliotecas PyCaret 3.3.2, scikit-learn 1.4.2 e LightGBM 4.6.0.
 
-Como o ruído inserido possui desvio padrão de 4 pontos, um RMSE próximo desse valor indica que o erro restante corresponde ao próprio ruído, que por definição não pode ser previsto. Para confirmar esse comportamento, as previsões do modelo foram comparadas com a fórmula sem ruído em 3.000 casos, obtendo-se um erro médio absoluto de 1,08 ponto, o que demonstra que o algoritmo aprendeu a lógica de pontuação em vez de apenas memorizar os exemplos.
+Como o escore de afinidade é um valor contínuo, entre 0 e 100, o problema foi tratado como regressão, e os algoritmos foram comparados por métricas de erro. Essas métricas medem a diferença entre o escore real $y_i$ e o escore previsto $\hat{y}_i$ em cada um dos $n$ registros avaliados. O Erro Absoluto Médio (MAE), dado pela Equação~\ref{eq:mae}, é a média dessas diferenças em valor absoluto.
 
-Ao final do processo de avaliação, o algoritmo vencedor foi consolidado, gerando um modelo de reconhecimento executável, atuando como o motor de raciocínio da aplicação.
+\begin{equation}
+MAE = \frac{1}{n} \sum_{i=1}^{n} \left| y_i - \hat{y}_i \right|
+\label{eq:mae}
+\end{equation}
+
+O MAE é expresso na mesma unidade do escore. Um MAE de 3, por exemplo, indica que o modelo erra em média 3 pontos na escala de 0 a 100. O Erro Quadrático Médio (MSE), dado pela Equação~\ref{eq:mse}, eleva cada diferença ao quadrado antes de calcular a média.
+
+\begin{equation}
+MSE = \frac{1}{n} \sum_{i=1}^{n} \left( y_i - \hat{y}_i \right)^2
+\label{eq:mse}
+\end{equation}
+
+Com o quadrado, um erro de 10 pontos pesa cem vezes mais que um erro de 1 ponto, o que faz o MSE penalizar com mais força os erros grandes. Por outro lado, seu valor fica em pontos ao quadrado e é mais difícil de interpretar. A Raiz do Erro Quadrático Médio (RMSE), dada pela Equação~\ref{eq:rmse}, traz a medida de volta à unidade original.
+
+\begin{equation}
+RMSE = \sqrt{MSE}
+\label{eq:rmse}
+\end{equation}
+
+O RMSE é sempre maior ou igual ao MAE, e quanto maior a distância entre os dois, maior a presença de erros grandes isolados. O Coeficiente de Determinação ($R^2$), dado pela Equação~\ref{eq:r2}, compara o erro do modelo com o de uma previsão que devolvesse sempre a média $\bar{y}$ dos escores.
+
+\begin{equation}
+R^2 = 1 - \frac{\sum_{i=1}^{n} \left( y_i - \hat{y}_i \right)^2}{\sum_{i=1}^{n} \left( y_i - \bar{y} \right)^2}
+\label{eq:r2}
+\end{equation}
+
+O $R^2$ representa a fração da variação do escore explicada pelo modelo. Ele vale 1 quando as previsões são perfeitas e 0 quando o modelo não supera o uso da média, podendo ser negativo quando o modelo é pior que ela. O PyCaret também informa o RMSLE, que calcula o RMSE sobre o logaritmo dos valores e mede o erro em termos relativos, e o MAPE, que expressa o erro médio como porcentagem do valor real. O resultado da comparação está na Tabela~\ref{tab:comparacao}.
+
+% Valores copiados da saída de compare_models() (tabela-modelos-treinamento.png).
+% Foram omitidos ridge, br, lar, huber e llar, cujos resultados repetem os de lr ou lasso.
+\begin{table}[htbp]
+\centering
+\caption{Comparação entre os algoritmos de regressão (média da validação cruzada em 10 partições)}
+\label{tab:comparacao}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccccc}
+\hline
+\textbf{Algoritmo} & \textbf{MAE} & \textbf{MSE} & \textbf{RMSE} & \textbf{$R^2$} & \textbf{MAPE} & \textbf{Tempo (s)} \\
+\hline
+Light Gradient Boosting Machine & 3,3278 & 17,4363 & 4,1755 & 0,9333 & 0,0664 & 0,93 \\
+Extreme Gradient Boosting       & 3,4840 & 19,0565 & 4,3649 & 0,9271 & 0,0664 & 0,31 \\
+Random Forest                   & 3,7258 & 21,8543 & 4,6745 & 0,9164 & 0,0740 & 7,42 \\
+Extra Trees                     & 3,7475 & 22,1576 & 4,7070 & 0,9153 & 0,0737 & 6,41 \\
+Gradient Boosting               & 3,7653 & 22,4450 & 4,7369 & 0,9142 & 0,0771 & 1,60 \\
+K Neighbors                     & 4,0463 & 26,5490 & 5,1521 & 0,8985 & 0,0886 & 0,24 \\
+Decision Tree                   & 5,0378 & 40,8181 & 6,3885 & 0,8439 & 0,0991 & 0,12 \\
+Linear Regression               & 5,9475 & 59,0299 & 7,6819 & 0,7743 & 0,1209 & 1,14 \\
+AdaBoost                        & 7,8417 & 90,3780 & 9,5060 & 0,6545 & 0,1654 & 1,13 \\
+Passive Aggressive              & 7,6746 & 92,1845 & 9,5329 & 0,6470 & 0,1472 & 0,07 \\
+Lasso Regression                & 8,5388 & 111,7844 & 10,5720 & 0,5727 & 0,1904 & 0,04 \\
+Elastic Net                     & 10,4065 & 166,0893 & 12,8868 & 0,3652 & 0,2365 & 0,04 \\
+Orthogonal Matching Pursuit     & 11,2313 & 193,8303 & 13,9219 & 0,2590 & 0,2515 & 0,04 \\
+Dummy Regressor                 & 13,1271 & 261,7599 & 16,1780 & -0,0004 & 0,3008 & 0,03 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+O LightGBM obteve o melhor resultado em todas as métricas de erro e empatou com o XGBoost apenas no MAPE. Os cinco primeiros colocados são combinações de árvores de decisão, enquanto a regressão linear não passou de $R^2$ igual a 0,77. Essa diferença decorre da forma como o escore foi construído. Na Equação~\ref{eq:escore}, o peso da senioridade, das competências comportamentais e da aderência técnica muda conforme a criticidade do projeto, e a pontuação do papel depende da combinação entre o papel do profissional e o que o projeto exige. A regressão linear atribui um único coeficiente a cada variável e, sem que essas combinações sejam criadas manualmente, não consegue representar que a senioridade vale mais em projetos de criticidade alta. As árvores de decisão dividem os dados em etapas sucessivas, por exemplo primeiro pela criticidade e depois pela senioridade, e assim capturam essas interações diretamente.
+
+O Dummy Regressor, que prevê sempre a média dos escores, serve como referência mínima. Seu $R^2$ é praticamente zero, como esperado pela definição da métrica, e seu RMSE de 16,18 pontos corresponde aproximadamente ao desvio padrão do próprio escore. O LightGBM reduziu esse erro para 4,18 pontos.
+
+Esse resultado precisa ser interpretado considerando o ruído $\varepsilon$ da Equação~\ref{eq:escore}, que tem desvio padrão de 4 pontos. Como é aleatório, nenhum modelo consegue prevê-lo, e por isso o menor RMSE possível nessa base é de aproximadamente 4 pontos, o que corresponde a um MSE de aproximadamente 16. Pelo mesmo motivo, o $R^2$ máximo alcançável fica em torno de $1 - 16/261{,}76 \approx 0{,}939$, tomando o MSE do Dummy Regressor como estimativa da variância do escore. Com MSE de 17,44 e $R^2$ de 0,933, o LightGBM ficou próximo desse limite.
+
+O LightGBM \cite{ke2017lightgbm} é uma implementação de \textit{gradient boosting}, técnica em que as árvores de decisão são construídas em sequência e cada nova árvore é treinada para corrigir os erros deixados pelas anteriores. Diferentemente de outras implementações, ele agrupa os valores das variáveis em faixas (histogramas) e expande cada árvore pela folha que mais reduz o erro, o que diminui o tempo de treinamento. Na comparação, o LightGBM levou 0,93 segundo, contra 7,42 segundos do Random Forest.
+
+Após a escolha do algoritmo, seus hiperparâmetros foram ajustados com a função \texttt{tune\_model} do PyCaret, que testa combinações de configurações usando a mesma validação cruzada em 10 partições. A configuração final utiliza 250 árvores com até 20 folhas cada, taxa de aprendizado de 0,1, no mínimo 61 registros por folha, 40\% das variáveis sorteadas para cada árvore, 80\% dos registros sorteados a cada 6 iterações e regularização L1 de 0,7 e L2 de 0,1. Com esse ajuste, o modelo alcançou RMSE de \textbf{[PREENCHER]} e $R^2$ de \textbf{[PREENCHER]}.
+
+Como os dados de treinamento contêm ruído, as métricas apresentadas comparam as previsões com valores que já incluem esse ruído. Para verificar se o modelo aprendeu a regra de pontuação, e não apenas os exemplos, suas previsões foram comparadas com o resultado da Equação~\ref{eq:escore} sem o termo $\varepsilon$ em 3.000 combinações sorteadas de candidato e projeto. O erro médio absoluto foi de 1,08 ponto, bem inferior ao desvio padrão do ruído, o que indica que o modelo reproduz a regra subjacente.
+
+O modelo ajustado foi então salvo como um arquivo e incorporado ao protótipo como o serviço de predição descrito na seção seguinte.
 
 Cabe registrar, como limitação do modelo, a natureza sintética da variável dependente. Devido à indisponibilidade de bases públicas com o histórico real de sucesso de equipes, o algoritmo foi treinado para aproximar a função lógica de alocação proposta por este trabalho, demonstrando viabilidade técnica que poderá ser validada em ambientes organizacionais reais em trabalhos futuros.

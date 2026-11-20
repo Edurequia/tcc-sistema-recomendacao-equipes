@@ -1,5 +1,3 @@
-# Modelo treinado: distribuido fora do repositorio (ver README)
-*.pkl
 
 .venv/
 __pycache__/

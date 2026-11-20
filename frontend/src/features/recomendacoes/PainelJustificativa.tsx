@@ -8,7 +8,11 @@ import { useJustificar } from '../../api/recomendacoes'
 import type { Recomendacao } from '../../api/tipos'
 import { Painel } from '../../components/Painel'
 
-/** Texto do modelo de linguagem explicando a equipe; gerado sob demanda e gravado na recomendacao. */
+/**
+ * Texto do modelo de linguagem explicando a equipe. Chega pronto com a
+ * recomendacao; o botao so aparece para repetir quando o modelo falhou ou para
+ * pedir uma nova versao.
+ */
 export function PainelJustificativa({ recomendacao }: { recomendacao: Recomendacao }) {
   const justificar = useJustificar(recomendacao.id)
   const [modelo, setModelo] = useState<string | null>(null)
@@ -56,12 +60,13 @@ export function PainelJustificativa({ recomendacao }: { recomendacao: Recomendac
           </>
         ) : (
           <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-            <Typography variant="body2" color="textSecondary">
-              Peça ao modelo de linguagem uma explicação em texto corrido de por que esta equipe foi sugerida, quem ficou de fora e quais
-              restrições pesaram. Pode levar alguns segundos.
-            </Typography>
+            {!justificar.isError && (
+              <Alert severity="info" role="status">
+                {recomendacao.avisoJustificativa ?? 'A justificativa não foi gerada junto com esta recomendação.'}
+              </Alert>
+            )}
             <Button variant="outlined" startIcon={<AutoAwesomeOutlined />} onClick={gerar} loading={justificar.isPending}>
-              Gerar justificativa
+              Tentar novamente
             </Button>
           </Stack>
         )}

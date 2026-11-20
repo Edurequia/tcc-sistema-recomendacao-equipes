@@ -1,5 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 import type { Alocacao, Projeto } from '../../api/tipos'
 import { umaAlocacao, umaPagina, umaRecomendacao, umaRecomendacaoResumo, umDesenvolvedorResumo, umProjeto } from '../../test/fixtures'
@@ -192,6 +192,17 @@ describe('detalhe do projeto', async () => {
     await usuario.click(screen.getByRole('button', { name: 'Gerar recomendação' }))
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/recomendacoes/7'))
+  })
+
+  it('avisa que a justificativa esta sendo redigida enquanto a recomendacao e gerada', async () => {
+    projeto()
+    servidor.use(http.post('/api/projetos/1/recomendacoes', () => delay('infinite')))
+    const { usuario } = await renderizarRota('/projetos/1')
+    await screen.findByRole('heading', { level: 1, name: 'Portal do Aluno' })
+
+    await usuario.click(screen.getByRole('button', { name: 'Gerar recomendação' }))
+
+    expect(await screen.findByText(/redigindo a justificativa/)).toBeInTheDocument()
   })
 
   it('avisa quando o motor de predicao esta fora do ar', async () => {

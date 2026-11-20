@@ -103,6 +103,21 @@ class RecomendacaoControllerTest {
     }
 
     @Test
+    @DisplayName("sem modelo de linguagem configurado, a recomendacao sai mesmo assim, com o aviso")
+    void semModeloDeLinguagemRecomendaComAviso() throws Exception {
+        Projeto projeto = projetoBackend();
+        Desenvolvedor ana = desenvolvedor("Ana Souza", Senioridade.SENIOR, PapelAtuacao.BACKEND, 30);
+        motorPontua(Map.of(ana.getId(), 91.0));
+
+        mvc.perform(post("/api/projetos/{id}/recomendacoes", projeto.getId()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.ranking.length()").value(1))
+                .andExpect(jsonPath("$.justificativaLlm").doesNotExist())
+                .andExpect(jsonPath("$.avisoJustificativa",
+                        org.hamcrest.Matchers.containsString("nao esta configurada")));
+    }
+
+    @Test
     @DisplayName("seleciona a equipe, calcula as metricas e sinaliza as restricoes")
     void deveSelecionarEquipeECalcularMetricas() throws Exception {
         // Projeto: 4 integrantes, 2 vagas de backend, Java e Spring obrigatorios

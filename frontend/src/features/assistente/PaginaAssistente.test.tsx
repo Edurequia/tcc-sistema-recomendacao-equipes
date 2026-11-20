@@ -15,7 +15,7 @@ const PERGUNTA: RespostaConversa = {
 
 const RECOMENDACAO: RespostaConversa = {
   status: 'RECOMENDACAO',
-  resposta: 'Criei o projeto "Portal do Aluno" e propus uma equipe de 2 integrante(s). Consulte o ranking completo ou peca a justificativa.',
+  resposta: 'Criei o projeto "Portal do Aluno" e propus uma equipe de 2 integrante(s). A justificativa e o ranking completo estao na recomendacao.',
   faltantes: [],
   entendido: { nome: 'Portal do Aluno', criticidade: 'ALTA', tamanhoEquipe: 2, horasSemanaisPorIntegrante: 20, papeis: ['Backend (2)'], tecnologias: ['Java'] },
   recomendacao: umaRecomendacao({ tamanhoEquipe: 2, observacaoRestricao: undefined }),

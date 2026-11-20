@@ -43,10 +43,14 @@ public interface DesenvolvedorRepository extends JpaRepository<Desenvolvedor, Lo
      *
      * Cada filtro nulo se anula na propria clausula, o que permite combinar
      * qualquer subconjunto deles sem montar a consulta dinamicamente.
+     *
+     * O cast do nome e obrigatorio no PostgreSQL: um parametro nulo sem tipo
+     * chega como bytea e lower(bytea) nao existe. O H2 dos testes nao acusa.
      */
     @Query("""
             select d from Desenvolvedor d
-            where (:nome is null or lower(d.nome) like lower(concat('%', :nome, '%')))
+            where (cast(:nome as String) is null
+                   or lower(d.nome) like lower(concat('%', cast(:nome as String), '%')))
               and (:senioridade is null or d.senioridade = :senioridade)
               and (:papel is null or d.papelPrincipal = :papel)
               and (:ativo is null or d.ativo = :ativo)

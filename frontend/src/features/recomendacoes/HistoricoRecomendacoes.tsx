@@ -46,7 +46,7 @@ export function HistoricoRecomendacoes({ projeto }: { projeto: Projeto }) {
     >
       {gerar.isPending && (
         <Typography variant="body2" color="textSecondary" sx={{ mb: 1.5 }}>
-          Pontuando os desenvolvedores ativos no motor de predição e compondo a equipe…
+          Pontuando os desenvolvedores ativos, compondo a equipe e redigindo a justificativa. Pode levar alguns segundos…
         </Typography>
       )}
       {historico.isError ? (

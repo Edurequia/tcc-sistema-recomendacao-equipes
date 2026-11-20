@@ -1,0 +1,411 @@
+{
+  "cenario": 1,
+  "titulo": "Formacao de equipes restritas a papeis minimos obrigatorios",
+  "projeto": {
+    "id": 1,
+    "nome": "Sistema de Matricula Online",
+    "descricao": "Reescrita do modulo de matricula, com portal do aluno e area administrativa.",
+    "criticidade": "MEDIA",
+    "criticidadeDescricao": "Balanceamento padrao entre habilidades tecnicas e perfil comportamental.",
+    "criticidadeNivel": 2,
+    "status": "PLANEJAMENTO",
+    "statusDescricao": "Em planejamento",
+    "tamanhoEquipe": 5,
+    "horasSemanaisPorIntegrante": 20,
+    "dataInicioPrevista": "2026-10-01",
+    "dataFimPrevista": "2027-03-31",
+    "vagasDeclaradas": 5,
+    "vagasSemPapelFixo": 0,
+    "papeisRequeridos": [
+      {
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "quantidade": 2
+      },
+      {
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "quantidade": 2
+      },
+      {
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "quantidade": 1
+      }
+    ],
+    "habilidadesRequeridas": [
+      {
+        "habilidadeId": 5,
+        "nome": "Java",
+        "categoria": "LINGUAGEM",
+        "obrigatoria": true,
+        "peso": 5,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 17,
+        "nome": "Spring Boot",
+        "categoria": "FRAMEWORK",
+        "obrigatoria": true,
+        "peso": 4,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 16,
+        "nome": "React",
+        "categoria": "FRAMEWORK",
+        "obrigatoria": true,
+        "peso": 4,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 22,
+        "nome": "PostgreSQL",
+        "categoria": "BANCO_DE_DADOS",
+        "obrigatoria": false,
+        "peso": 3,
+        "usadaNoModelo": true
+      },
+      {
+        "habilidadeId": 27,
+        "nome": "Docker",
+        "categoria": "DEVOPS",
+        "obrigatoria": false,
+        "peso": 3,
+        "usadaNoModelo": true
+      }
+    ]
+  },
+  "totalBase": 20,
+  "recomendacao": {
+    "id": 1,
+    "projetoId": 1,
+    "projetoNome": "Sistema de Matricula Online",
+    "origem": "FORMULARIO",
+    "origemDescricao": "Via de fluxo estruturado (formularios)",
+    "criadoEm": "2026-09-20T20:54:40.3652443-03:00",
+    "tamanhoEquipe": 5,
+    "totalCandidatos": 20,
+    "integrantesSelecionados": 5,
+    "metricas": {
+      "coberturaPapeis": 100.0,
+      "coberturaTecnologias": 100.0,
+      "desvioPadraoSenioridade": 0.49,
+      "desvioPadraoScore": 15.611,
+      "scoreMedioEquipe": 69.674
+    },
+    "ranking": [
+      {
+        "posicao": 1,
+        "desenvolvedorId": 9,
+        "nome": "Iara Teixeira",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 88.028,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 2,
+        "desenvolvedorId": 1,
+        "nome": "Ana Souza",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 86.66,
+        "aderenciaTecnica": 0.7895,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 3,
+        "desenvolvedorId": 6,
+        "nome": "Fabio Nunes",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 85.745,
+        "aderenciaTecnica": 0.7895,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 4,
+        "desenvolvedorId": 11,
+        "nome": "Karina Dutra",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 77.271,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 5,
+        "desenvolvedorId": 10,
+        "nome": "Joao Pedroso",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 76.535,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 6,
+        "desenvolvedorId": 14,
+        "nome": "Nelson Rocha",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 70.765,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 7,
+        "desenvolvedorId": 3,
+        "nome": "Carla Reis",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 69.738,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 8,
+        "desenvolvedorId": 2,
+        "nome": "Bruno Lima",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 69.542,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 9,
+        "desenvolvedorId": 7,
+        "nome": "Gisele Prado",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 68.884,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 10,
+        "desenvolvedorId": 13,
+        "nome": "Marina Costa",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 66.02,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 11,
+        "desenvolvedorId": 12,
+        "nome": "Lucas Ferraz",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "FULLSTACK",
+        "papelDescricao": "FullStack",
+        "scoreAfinidade": 65.188,
+        "aderenciaTecnica": 0.6316,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 12,
+        "desenvolvedorId": 15,
+        "nome": "Olivia Ramos",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 59.216,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 13,
+        "desenvolvedorId": 4,
+        "nome": "Diego Alves",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 54.264,
+        "aderenciaTecnica": 0.4737,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 14,
+        "desenvolvedorId": 5,
+        "nome": "Eva Martins",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 53.346,
+        "aderenciaTecnica": 0.4737,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 15,
+        "desenvolvedorId": 8,
+        "nome": "Hugo Barros",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "BACKEND",
+        "papelDescricao": "Backend",
+        "scoreAfinidade": 52.81,
+        "aderenciaTecnica": 0.4737,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 16,
+        "desenvolvedorId": 20,
+        "nome": "Tiago Bastos",
+        "senioridade": "SENIOR",
+        "senioridadeDescricao": "Senior",
+        "papel": "DEVOPS",
+        "papelDescricao": "DevOps",
+        "scoreAfinidade": 51.618,
+        "aderenciaTecnica": 0.1579,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 17,
+        "desenvolvedorId": 16,
+        "nome": "Paulo Vieira",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "FRONTEND",
+        "papelDescricao": "Frontend",
+        "scoreAfinidade": 46.805,
+        "aderenciaTecnica": 0.2105,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 18,
+        "desenvolvedorId": 17,
+        "nome": "Quezia Amaral",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "scoreAfinidade": 45.984,
+        "aderenciaTecnica": 0.4211,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": true
+      },
+      {
+        "posicao": 19,
+        "desenvolvedorId": 19,
+        "nome": "Sandra Vitoria",
+        "senioridade": "PLENO",
+        "senioridadeDescricao": "Pleno",
+        "papel": "DEVOPS",
+        "papelDescricao": "DevOps",
+        "scoreAfinidade": 41.099,
+        "aderenciaTecnica": 0.1579,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      },
+      {
+        "posicao": 20,
+        "desenvolvedorId": 18,
+        "nome": "Rafael Moura",
+        "senioridade": "JUNIOR",
+        "senioridadeDescricao": "Junior",
+        "papel": "QA",
+        "papelDescricao": "QA / Testes",
+        "scoreAfinidade": 34.254,
+        "aderenciaTecnica": 0.4211,
+        "coberturaHoras": 1.0,
+        "elegivel": true,
+        "selecionado": false
+      }
+    ]
+  },
+  "linhaBase": {
+    "recomendacaoId": 1,
+    "projetoId": 1,
+    "sorteios": 100,
+    "semente": 42,
+    "candidatosElegiveis": 20,
+    "tamanhoEquipeSorteada": 5,
+    "prototipo": {
+      "coberturaPapeis": 100.0,
+      "coberturaTecnologias": 100.0,
+      "desvioPadraoSenioridade": 0.49,
+      "desvioPadraoScore": 15.611,
+      "scoreMedioEquipe": 69.674
+    },
+    "linhaBase": {
+      "media": {
+        "coberturaPapeis": 59.6,
+        "coberturaTecnologias": 93.84,
+        "desvioPadraoSenioridade": 0.702,
+        "desvioPadraoScore": 13.603,
+        "scoreMedioEquipe": 62.882
+      },
+      "desvioPadrao": {
+        "coberturaPapeis": 16.97,
+        "coberturaTecnologias": 8.52,
+        "desvioPadraoSenioridade": 0.148,
+        "desvioPadraoScore": 3.329,
+        "scoreMedioEquipe": 5.69
+      }
+    }
+  }
+}

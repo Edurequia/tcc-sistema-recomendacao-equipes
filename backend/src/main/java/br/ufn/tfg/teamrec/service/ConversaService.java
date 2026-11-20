@@ -62,7 +62,7 @@ public class ConversaService {
                 : "uma equipe parcial, com %d dos %d integrantes previstos"
                         .formatted(recomendacao.integrantesSelecionados(), recomendacao.tamanhoEquipe());
 
-        return "Criei o projeto \"%s\" e propus %s. Consulte o ranking completo ou peca a justificativa."
+        return "Criei o projeto \"%s\" e propus %s. A justificativa e o ranking completo estao na recomendacao."
                 .formatted(recomendacao.projetoNome(), equipe);
     }
 

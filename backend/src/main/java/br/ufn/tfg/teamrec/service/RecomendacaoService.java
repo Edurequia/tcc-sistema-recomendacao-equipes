@@ -45,6 +45,8 @@ import br.ufn.tfg.teamrec.service.composicao.ResultadoComposicao;
 import br.ufn.tfg.teamrec.service.composicao.TecnologiaExigida;
 import br.ufn.tfg.teamrec.shared.exception.RecursoNaoEncontradoException;
 import br.ufn.tfg.teamrec.shared.exception.RegraDeNegocioException;
+import br.ufn.tfg.teamrec.shared.exception.ServicoExternoException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +71,10 @@ import java.util.stream.Collectors;
  * metodo inteiro. A chamada ao motor pode levar ate o read-timeout configurado;
  * dentro de uma transacao, isso seguraria uma conexao do banco durante toda a
  * espera. Por isso sao tres etapas: leitura, chamada sem transacao, gravacao.
+ * A justificativa, pedida em seguida ao modelo de linguagem, segue o mesmo
+ * padrao.
  */
+@Slf4j
 @Service
 public class RecomendacaoService {
 
@@ -136,7 +141,8 @@ public class RecomendacaoService {
 
     /**
      * Pontua todos os desenvolvedores ativos para o projeto, compoe a equipe
-     * a partir do ranking e grava o resultado com as metricas de avaliacao.
+     * a partir do ranking, grava o resultado com as metricas de avaliacao e
+     * devolve a recomendacao ja acompanhada da justificativa.
      */
     public RecomendacaoResponse gerar(Long projetoId) {
         return gerar(projetoId, OrigemRecomendacao.FORMULARIO, null);
@@ -145,8 +151,31 @@ public class RecomendacaoService {
     private RecomendacaoResponse gerar(Long projetoId, OrigemRecomendacao origem, String consultaOriginal) {
         Preparacao preparacao = transacaoLeitura.execute(status -> preparar(projetoId));
         PredicaoMotorResponse resposta = motor.prever(preparacao.requisicao());
-        return transacaoEscrita.execute(
+        RecomendacaoResponse gravada = transacaoEscrita.execute(
                 status -> gravar(projetoId, preparacao, resposta, origem, consultaOriginal));
+        return comJustificativa(gravada);
+    }
+
+    /**
+     * A justificativa e um complemento: sem ela, a recomendacao continua valida.
+     * Por isso a falha do modelo de linguagem nao desfaz o que ja foi gravado;
+     * a recomendacao volta com o motivo em avisoJustificativa, e o gestor pode
+     * tentar de novo pelo endpoint de justificativa.
+     */
+    private RecomendacaoResponse comJustificativa(RecomendacaoResponse gravada) {
+        try {
+            return comTexto(gravada, justificar(gravada.id(), false).justificativa(), null);
+        } catch (ServicoExternoException ex) {
+            log.warn("Recomendacao {} gravada sem justificativa: {}", gravada.id(), ex.getMessage());
+            return comTexto(gravada, null, ex.getMessage());
+        }
+    }
+
+    private static RecomendacaoResponse comTexto(RecomendacaoResponse r, String justificativa, String aviso) {
+        return new RecomendacaoResponse(r.id(), r.projetoId(), r.projetoNome(), r.origem(),
+                r.origemDescricao(), r.criadoEm(), r.tamanhoEquipe(), r.totalCandidatos(),
+                r.integrantesSelecionados(), r.metricas(), r.observacaoRestricao(),
+                justificativa, aviso, r.ranking());
     }
 
     /**
